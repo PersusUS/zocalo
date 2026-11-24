@@ -486,7 +486,7 @@ const Engine = (() => {
   }
 
   // Exact endgame solver. Returns true/false, or null when it runs out of budget.
-  function exact(g, s, aliceTurn, limit) {
+  function exact(g, s, aliceTurn, limit) { s = Uint8Array.from(s); // si se agota el presupuesto, la pared original queda intacta
     const memo = new Map();
     let nodes = 0;
     const go = (left, alice) => {
@@ -509,9 +509,10 @@ const Engine = (() => {
   }
 
   function exactMove(g, s, aliceTurn, limit) {
-    if (freeCount(s) > 16) return null;
-    const list = moves(g, s);
+    if (freeCount(s) > 13) return null;
+    const list = moves(g, s), t0 = Date.now();
     for (const [v, c] of list) {
+      if (Date.now() - t0 > 500) return null; // tope de tiempo para móviles
       s[v] = c;
       const r = deadCells(g, s).length ? false : exact(g, s, !aliceTurn, limit);
       s[v] = 0;
@@ -1178,6 +1179,28 @@ body.z-on { background: var(--z-ground); background-image: none; }
 #z .z-lv strong i { font: 400 15px/1.2 var(--z-body); color: var(--z-star); white-space: nowrap; }
 #z .z-lv span { color: var(--z-psoft); }
 .z-field { display: grid; gap: 8px; }
+.z-toast { position: fixed; left: 50%; top: calc(12px + env(safe-area-inset-top, 0px)); transform: translateX(-50%); z-index: 30; display: flex; gap: 12px; align-items: center; width: max-content; max-width: calc(100vw - 32px); background: #14255c; color: #fff; font: 500 16px/1.3 var(--z-body); padding: 10px 18px 10px 12px; border-radius: 14px; box-shadow: 0 8px 24px rgba(0,0,0,.35), inset 0 0 0 2px rgba(255,255,255,.25); animation: z-drop .4s cubic-bezier(.2,1.4,.4,1); }
+.z-toast > svg, .z-toast > .z-prev { width: 46px; height: 46px; flex: none; }
+.z-toast small { display: block; font-size: 13px; opacity: .85; } .z-toast b { font: 400 19px/1.1 var(--z-display); }
+.z-toast.plat { background: #cdeefb; color: #14255c; }
+.z-rain { position: fixed; top: 0; width: 34px; height: 34px; z-index: 25; pointer-events: none; }
+.z-tro { display: grid; grid-template-columns: 46px minmax(0, 1fr); gap: 12px; align-items: center; background: var(--z-panel); color: var(--z-ptext); border-radius: 12px; padding: 12px; }
+.z-tro svg { width: 46px; height: 46px; } .z-tro b { font: 400 18px/1.15 var(--z-display); display: block; }
+.z-tro span { display: block; font-size: 14px; color: var(--z-psoft); } .z-tro small { font-size: 13px; font-weight: 700; }
+.z-sk { display: grid; grid-template-columns: repeat(auto-fill, minmax(104px, 1fr)); gap: 10px; }
+#z .z-skb { background: var(--z-panel); color: var(--z-ptext); border-radius: 12px; padding: 12px 8px; display: grid; gap: 4px; justify-items: center; align-content: start; text-align: center; font-size: 15px; }
+#z .z-skb:disabled { opacity: 1; } #z .z-skb.on { box-shadow: 0 0 0 4px var(--z-btn); }
+#z .z-skb small { font-size: 13px; font-weight: 500; line-height: 1.25; color: var(--z-psoft); }
+.z-prev { display: block; width: 72px; height: 72px; border-radius: 14px; overflow: hidden; } .z-prev > svg { width: 100%; height: 100%; display: block; }
+.z-skb.no .z-prev { filter: grayscale(1) brightness(.75); opacity: .45; }
+.z-four { display: grid; grid-template-columns: 1fr 1fr; gap: 2px; width: 100%; height: 100%; } .z-four svg { width: 100%; height: 100%; display: block; }
+.z-swatch { display: block; width: 100%; height: 100%; background: linear-gradient(135deg, var(--z-ground) 60%, var(--z-btn) 60%); }
+.z-swatch[data-zt="albero"] { --z-ground:#e7a838; --z-btn:#1f3f9e; }
+body[data-zt="patio"].z-on, .z-swatch[data-zt="patio"] { --z-ground:#2f7d5b; --z-ink:#fbf6e6; --z-soft:#e0efe2; --z-wall:#fbfaf5; --z-grout:#cfd6c8; --z-panel:#fbf6e6; --z-ptext:#123c2b; --z-psoft:#45604f; --z-btn:#f0b429; --z-btntx:#123c2b; --z-btnedge:#a8780f; --z-bad:#b3241f; --z-good:#1f7a4b; --z-star:#b97a06; }
+body[data-zt="atardecer"].z-on, .z-swatch[data-zt="atardecer"] { --z-ground:#f0876c; --z-ink:#3a0f3d; --z-soft:#521f50; --z-wall:#fffaf3; --z-grout:#e8cfc4; --z-panel:#fff3e8; --z-ptext:#3a0f3d; --z-psoft:#744a70; --z-btn:#6b1f6e; --z-btntx:#fff3e8; --z-btnedge:#41103f; --z-bad:#b3241f; --z-good:#1f7a4b; --z-star:#c07206; }
+body[data-zt="medianoche"].z-on, .z-swatch[data-zt="medianoche"] { --z-ground:#17122b; --z-ink:#efe6ff; --z-soft:#b9aed8; --z-wall:#e9e6f2; --z-grout:#8d86a8; --z-panel:#2a2148; --z-ptext:#efe6ff; --z-psoft:#b9aed8; --z-btn:#5eead4; --z-btntx:#0f2b2a; --z-btnedge:#1f8a7c; --z-bad:#ff7a90; --z-good:#6fe0b0; --z-star:#ffd35c; }
+body[data-zt="platino"].z-on, .z-swatch[data-zt="platino"] { --z-ground:#c3cedb; --z-ink:#16233d; --z-soft:#34435f; --z-wall:#ffffff; --z-grout:#97a5b7; --z-panel:#f4f8fc; --z-ptext:#16233d; --z-psoft:#4c5b76; --z-btn:#3a6f96; --z-btntx:#ffffff; --z-btnedge:#1f4866; --z-bad:#b3241f; --z-good:#1f7a4b; --z-star:#2f7fb0; }
+@keyframes z-drop { from { transform: translate(-50%, -80px); } }
 @keyframes z-pop { from { transform: scale(.2) rotate(-14deg); } }
 @keyframes z-shake { 20% { transform: translateX(-9px) rotate(-.6deg); } 45% { transform: translateX(8px) rotate(.6deg); } 70% { transform: translateX(-5px); } }
 @keyframes z-warn { 50% { box-shadow: 0 0 0 1px #c4312b; } }
@@ -1198,17 +1221,24 @@ body.z-on { background: var(--z-ground); background-image: none; }
       <button class="z-mode" type="button" data-go="puz"><strong>Golpes maestros</strong><span id="z-p-sub"></span></button>
       <button class="z-mode" type="button" data-go="duel"><strong>Duelo</strong><span>Dos personas, un móvil</span></button>
     </div>
+    <div class="z-modes">
+      <button class="z-mode" type="button" data-go="tro"><strong>Trofeos</strong><span id="z-t-sub"></span></button>
+      <button class="z-mode" type="button" data-go="skins"><strong>Vestuario</strong><span id="z-k-sub"></span></button>
+    </div>
     <div class="z-row"><button class="z-chip" type="button" data-go="help">Cómo se juega</button><a class="z-chip" href="#juego" style="color:inherit;text-decoration:none">Modo clase: la demostración</a></div>
   </section>
-  <section class="z-screen" data-s="map" hidden><div class="z-row z-between"><h2>Campaña</h2><button class="z-chip" type="button" data-go="home">Inicio</button></div><p class="z-note" id="z-map-sub"></p><div class="z-levels" id="z-levels"></div></section>
+  <section class="z-screen" data-s="map" hidden><div class="z-row z-between"><h2>Campaña</h2><button class="z-chip" type="button" data-go="home">Inicio</button></div><p class="z-note" id="z-map-sub"></p><div class="z-row"><button class="z-chip" type="button" id="z-exp"></button><span class="z-note">Sin puntos ni avisos. Un ◆ marca lo superado así.</span></div><div class="z-levels" id="z-levels"></div></section>
   <section class="z-screen" data-s="puz" hidden><div class="z-row z-between"><h2>Golpes maestros</h2><button class="z-chip" type="button" data-go="home">Inicio</button></div><p class="z-note">Eres Bob y la grieta está ahí, pero hay que verla. Cada problema tiene solución forzada: tus amenazas obligan a Alice a responder.</p><div class="z-levels" id="z-puzzles"></div></section>
   <section class="z-screen" data-s="duel" hidden><div class="z-row z-between"><h2>Duelo</h2><button class="z-chip" type="button" data-go="home">Inicio</button></div>
     <div class="z-panel"><div class="z-field"><b>Azulejos distintos</b><div class="z-row" id="z-d-k"></div></div><div class="z-field"><b>Columnas</b><div class="z-row" id="z-d-n"></div></div><p class="z-note" id="z-d-note"></p><button class="z-btn" id="z-d-go" type="button">Empezar</button></div></section>
+  <section class="z-screen" data-s="tro" hidden><div class="z-row z-between"><h2>Trofeos</h2><button class="z-chip" type="button" data-go="home">Inicio</button></div><div style="display:grid;gap:8px"><b id="z-tro-sub"></b><div class="z-clock"><i id="z-tro-bar"></i></div><p class="z-note">«Sin ayudas» significa sin pistas ni deshacer.</p></div><div class="z-screen" id="z-tros"></div></section>
+  <section class="z-screen" data-s="skins" hidden><div class="z-row z-between"><h2>Vestuario</h2><button class="z-chip" type="button" data-go="home">Inicio</button></div><div class="z-screen" id="z-skins"></div></section>
   <section class="z-screen" data-s="help" hidden><div class="z-row z-between"><h2>Cómo se juega</h2><button class="z-chip" type="button" data-go="home">Inicio</button></div>
     <div class="z-panel"><h3>Turnos</h3><p>Alice y Bob colocan un azulejo cada uno. Toca un hueco y después el azulejo. No puede ser igual que el de arriba, abajo, izquierda o derecha.</p>
     <h3>Los puntos</h3><p>Los puntos de un hueco son los azulejos que aún caben. Si un hueco se queda sin puntos, la pared se agrieta y gana Bob. Si se completa, gana Alice.</p>
     <h3>Peligro</h3><p>Un hueco rojo se puede agrietar en la próxima jugada. Alice debe salvarlo; Bob debe rematarlo.</p>
     <h3>Herramientas</h3><p><b>Espátula</b> (Alice): quita un azulejo ya puesto sin gastar turno. Si la pared se agrieta, te salva. <b>Doble</b> (Bob): coloca dos azulejos seguidos.</p>
+    <h3>Trofeos y skins</h3><p>Cada trofeo acerca al platino y muchos desbloquean skins en el Vestuario. El <b>modo experto</b> de la campaña quita los puntos y los avisos de peligro.</p>
     <h3>Teclado</h3><p>Flechas para moverte, números del 1 al 5 para colocar.</p></div></section>
   <section class="z-screen" data-s="play" hidden style="gap:12px">
     <div class="z-row z-between" style="flex-wrap:nowrap"><button class="z-chip" type="button" id="z-exit">Salir</button><b id="z-title" style="font:400 19px/1.1 var(--z-display);text-align:center;min-width:0"></b><button class="z-chip z-mutebtn" type="button">Sonido: sí</button></div>
@@ -1221,6 +1251,7 @@ body.z-on { background: var(--z-ground); background-image: none; }
   </section>
   <div class="z-over" id="z-over" hidden role="dialog" aria-modal="true" aria-labelledby="z-o-t"><div class="z-panel"><h2 id="z-o-t"></h2><div class="z-stars" id="z-o-s"></div><p id="z-o-p" style="margin:0 auto"></p><ul class="z-goals" id="z-o-g"></ul><div class="z-row" id="z-o-b"></div></div></div>
 </main>
+<div class="z-toast" id="z-toast" role="status" hidden></div>
 <script id="rival">// Rivales del juego sobre el motor: 0 aprendiz, 1 oficial, 2 maestro.
 const Rival = (() => {
   const E = Engine, pick = a => a[Math.floor(Math.random() * a.length)];
@@ -1277,39 +1308,90 @@ const calm = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const NAMES = ['', 'azul', 'albero', 'verde', 'granate', 'celeste'];
 
 // ---------- azulejos ----------
-const ART = ['',
-  '<rect width="40" height="40" fill="#2346a8"/><path d="M20 4l4.5 11.5L36 20l-11.500 4.500L20 36l-4.500-11.500L4 20l11.500-4.500z" fill="#fbfaf5"/><circle cx="20" cy="20" r="4" fill="#2346a8"/>',
-  '<rect width="40" height="40" fill="#f0b429"/><path d="M20 3L37 20 20 37 3 20z" fill="#fbfaf5"/><path d="M20 11l9 9-9 9-9-9z" fill="#a8580f"/>',
-  '<rect width="40" height="40" fill="#2e8b57"/><g fill="#fbfaf5"><circle cx="20" cy="11" r="7"/><circle cx="20" cy="29" r="7"/><circle cx="11" cy="20" r="7"/><circle cx="29" cy="20" r="7"/></g><circle cx="20" cy="20" r="5" fill="#2e8b57"/>',
-  '<rect width="40" height="40" fill="#8e2f4a"/><path d="M15 3h10v12h12v10H25v12H15V25H3V15h12z" fill="#fbfaf5"/><rect x="17" y="17" width="6" height="6" fill="#8e2f4a"/>',
-  '<rect width="40" height="40" fill="#57b7d6"/><g fill="none" stroke="#14255c" stroke-width="4"><path d="M0 12q10-10 20 0t20 0"/><path d="M0 24q10-10 20 0t20 0"/><path d="M0 36q10-10 20 0t20 0"/></g>'];
-const tile = c => '<svg viewBox="0 0 40 40" aria-hidden="true">' + ART[c] + '</svg>';
-const HEX = ['', '#2346a8', '#f0b429', '#2e8b57', '#8e2f4a', '#57b7d6'];
+const wrap = (bg, o) => `<rect width="40" height="40" fill="${bg}"/>${o}`;
+const px = (bg, rows, pal) => wrap(bg, rows.map((r, y) => [...r].map((ch, x) => pal[ch] ? `<rect x="${4 + x * 4}" y="${4 + y * 4}" width="4.1" height="4.1" fill="${pal[ch]}"/>` : '').join('')).join(''));
+const glow = (p, c) => wrap('#0b0f2a', `<g fill="none" stroke="${c}" stroke-linejoin="round" stroke-linecap="round"><g stroke-width="9" opacity=".28">${p}</g><g stroke-width="4">${p}</g></g>`);
+const gem = (p, q, c, l) => wrap('#b9c4d2', `<path d="M0 0h40L0 40z" fill="#e8eef5"/><rect x="2" y="2" width="36" height="36" rx="5" fill="none" stroke="#8d9aac" stroke-width="2"/><path d="${p}" fill="${c}"/><path d="${q}" fill="${l}"/>`);
+const SETS = {
+  triana: { n: 'Triana', hex: ['', '#2346a8', '#f0b429', '#2e8b57', '#8e2f4a', '#57b7d6'], art: ['',
+    wrap('#2346a8', '<path d="M20 4l4.500 11.500L36 20l-11.500 4.500L20 36l-4.500-11.500L4 20l11.500-4.500z" fill="#fbfaf5"/><circle cx="20" cy="20" r="4" fill="#2346a8"/>'),
+    wrap('#f0b429', '<path d="M20 3L37 20 20 37 3 20z" fill="#fbfaf5"/><path d="M20 11l9 9-9 9-9-9z" fill="#a8580f"/>'),
+    wrap('#2e8b57', '<g fill="#fbfaf5"><circle cx="20" cy="11" r="7"/><circle cx="20" cy="29" r="7"/><circle cx="11" cy="20" r="7"/><circle cx="29" cy="20" r="7"/></g><circle cx="20" cy="20" r="5" fill="#2e8b57"/>'),
+    wrap('#8e2f4a', '<path d="M15 3h10v12h12v10H25v12H15V25H3V15h12z" fill="#fbfaf5"/><rect x="17" y="17" width="6" height="6" fill="#8e2f4a"/>'),
+    wrap('#57b7d6', '<g fill="none" stroke="#14255c" stroke-width="4"><path d="M0 12q10-10 20 0t20 0"/><path d="M0 24q10-10 20 0t20 0"/><path d="M0 36q10-10 20 0t20 0"/></g>')] },
+  mudejar: { n: 'Mudéjar', hex: ['', '#0f766e', '#d97706', '#7c2d12', '#3b2f9b', '#be185d'], art: ['',
+    wrap('#0f766e', '<g fill="#f8efd8"><rect x="9" y="9" width="22" height="22"/><rect x="9" y="9" width="22" height="22" transform="rotate(45 20 20)"/></g><circle cx="20" cy="20" r="6" fill="#0f766e"/>'),
+    wrap('#d97706', '<path d="M20 3l15 8.500v17L20 37 5 28.500v-17z" fill="#f8efd8"/><path d="M20 11l8 4.500v9L20 29l-8-4.500v-9z" fill="#d97706"/><circle cx="20" cy="20" r="3" fill="#f8efd8"/>'),
+    wrap('#7c2d12', '<g fill="none" stroke="#f8efd8" stroke-width="4.500"><path d="M0 12l10-8 10 8 10-8 10 8"/><path d="M0 25l10-8 10 8 10-8 10 8"/><path d="M0 38l10-8 10 8 10-8 10 8"/></g>'),
+    wrap('#3b2f9b', '<path fill="#f8efd8" d="M0 0h10v10H0zM20 0h10v10H20zM10 10h10v10H10zM30 10h10v10H30zM0 20h10v10H0zM20 20h10v10H20zM10 30h10v10H10zM30 30h10v10H30z"/>'),
+    wrap('#be185d', '<g fill="none" stroke="#f8efd8" stroke-width="4"><circle cx="20" cy="20" r="15"/><path d="M20 9l11 11-11 11L9 20z"/></g><circle cx="20" cy="20" r="3.500" fill="#f8efd8"/>')] },
+  frutas: { n: 'Frutería', hex: ['', '#4156b8', '#e9b90b', '#3c9d4e', '#c62839', '#f08a24'], art: ['',
+    wrap('#c9d2f7', '<circle cx="14" cy="25" r="8" fill="#4156b8"/><circle cx="26" cy="25" r="8" fill="#35479d"/><circle cx="20" cy="14" r="8" fill="#5368cf"/><circle cx="20" cy="12" r="2.500" fill="#c9d2f7"/>'),
+    wrap('#fff3b0', '<ellipse cx="20" cy="21" rx="15" ry="10.500" fill="#e9b90b" transform="rotate(-25 20 21)"/><ellipse cx="17" cy="18" rx="6" ry="3" fill="#fbe47c" transform="rotate(-25 17 18)"/><path d="M30 9q7-6 8 1-5 4-8-1z" fill="#3c9d4e"/>'),
+    wrap('#d3f2d4', '<path d="M3 13h34a17 17 0 01-34 0z" fill="#3c9d4e"/><path d="M6.500 13h27a13.500 13.500 0 01-27 0z" fill="#f4637a"/><g fill="#22264a"><circle cx="14" cy="18" r="1.600"/><circle cx="20" cy="21" r="1.600"/><circle cx="26" cy="18" r="1.600"/></g>'),
+    wrap('#fbd0d5', '<path d="M13 25Q15 12 28 5M27 26Q27 14 28 5" fill="none" stroke="#3c7a3e" stroke-width="2.500"/><circle cx="13" cy="28" r="7.500" fill="#c62839"/><circle cx="28" cy="29" r="7.500" fill="#a81d2d"/><circle cx="11" cy="26" r="2" fill="#fff"/><circle cx="26" cy="27" r="2" fill="#fff"/>'),
+    wrap('#ffdcb8', '<circle cx="20" cy="21" r="15" fill="#f08a24"/><circle cx="20" cy="21" r="11.500" fill="#ffe2b8"/><circle cx="20" cy="21" r="10" fill="#f9a64b"/><path stroke="#ffe2b8" stroke-width="2" d="M20 11v20M10 21h20M13 14l14 14M27 14L13 28"/>')] },
+  pixel: { n: 'Píxel', hex: ['', '#3b6df0', '#f2c12e', '#3fae4a', '#e0394b', '#9a5be0'], art: ['',
+    px('#16295e', ['..####..', '.#oo###.', '#oo#####', '########', '.######.', '..####..', '...##...', '........'], { '#': '#3b6df0', o: '#bcd0ff' }),
+    px('#6b4a05', ['..####..', '.######.', '##o##o##', '##o##o##', '########', '##oooo##', '.######.', '..####..'], { '#': '#f2c12e', o: '#6b4a05' }),
+    px('#10401a', ['........', '..####..', '.######.', '########', '#o####o#', '########', '########', '#.#..#.#'], { '#': '#3fae4a', o: '#fff' }),
+    px('#4d0d18', ['.##..##.', '#oo#####', '#o######', '########', '.######.', '..####..', '...##...', '........'], { '#': '#e0394b', o: '#ffc2c9' }),
+    px('#2f1650', ['...##...', '..####..', '.######.', '########', '.######.', '..####..', '.#o##o#.', '##.##.##'], { '#': '#9a5be0', o: '#fff' })] },
+  neon: { n: 'Neón', hex: ['', '#38bdf8', '#facc15', '#4ade80', '#fb7185', '#c084fc'], art: ['',
+    glow('<circle cx="20" cy="20" r="11"/>', '#38bdf8'), glow('<path d="M20 8l12 22H8z"/>', '#facc15'), glow('<rect x="10" y="10" width="20" height="20"/>', '#4ade80'),
+    glow('<path d="M10 10l20 20M30 10L10 30"/>', '#fb7185'), glow('<path d="M6 25l7-11 7 11 7-11 7 11"/>', '#c084fc')] },
+  platino: { n: 'Platino', hex: ['', '#1d4ed8', '#d49a06', '#0f8a4d', '#be123c', '#7e22ce'], art: ['',
+    gem('M20 6l13 14-13 14L7 20z', 'M20 6l13 14H7z', '#1d4ed8', '#7fa4f5'), gem('M20 6l14 25H6z', 'M20 6L13 31H6z', '#d49a06', '#f7d774'), gem('M12 8h16l6 12-6 12H12L6 20z', 'M12 8h16l6 12H6z', '#0f8a4d', '#6fd9a5'),
+    gem('M13 9q7 0 7 7 0-7 7-7 8 0 7 9-2 8-14 16Q8 26 6 18q-1-9 7-9z', 'M13 9q7 0 7 7v5Q10 22 6 18q-1-9 7-9z', '#be123c', '#f58aa3'), gem('M20 5l4 11 11 4-11 4-4 11-4-11-11-4 11-4z', 'M20 5l4 11-4 4-4-4z', '#7e22ce', '#cf9cf2')] }
+};
+const tset = id => SETS[id || save.skin.t] || SETS.triana;
+const tile = (c, id) => '<svg viewBox="0 0 40 40" aria-hidden="true">' + tset(id).art[c] + '</svg>';
+const hex = c => tset().hex[c];
 const eye = (x, y, r, lx, ly) => `<circle cx="${x}" cy="${y}" r="${r}" fill="#fff"/><circle cx="${x + (lx || 0)}" cy="${y + (ly || 0)}" r="${r * .62}" fill="#14255c"/><circle cx="${x + (lx || 0) + r * .2}" cy="${y + (ly || 0) - r * .25}" r="${r * .22}" fill="#fff"/>`;
 const line = (p, w, c) => `<path d="${p}" fill="none" stroke="${c || '#14255c'}" stroke-width="${w || 3}" stroke-linecap="round" stroke-linejoin="round"/>`;
+const crown = (c, g) => `<path d="M22 19l-3-16 11 8 10-11 10 11 11-8-3 16z" fill="${c}" stroke="#14255c" stroke-width="2" stroke-linejoin="round"/><circle cx="40" cy="13" r="3" fill="${g}"/>`;
+const helmet = c => `<path d="M17 19a23 17 0 0146 0z" fill="${c}"/><rect x="11" y="17" width="58" height="6" rx="3" fill="${c}"/><rect x="36" y="2" width="8" height="15" rx="3" fill="#fff" opacity=".6"/>`;
+const ALICE = {
+  clasica: { n: 'Clásica', bg: '#f7dc9a', f: '#2346a8' },
+  flamenca: { n: 'Flamenca', bg: '#f9c6c0', f: '#c62839', over: '<g fill="#c62839" stroke="#7d1420" stroke-width="1"><circle cx="60" cy="7" r="6"/><circle cx="68" cy="13" r="6"/><circle cx="65" cy="22" r="6"/><circle cx="55" cy="22" r="6"/><circle cx="52" cy="13" r="6"/></g><circle cx="60" cy="15" r="5" fill="#f0b429"/><g fill="#fff"><circle cx="9" cy="24" r="2"/><circle cx="9" cy="42" r="2"/><circle cx="9" cy="60" r="2"/><circle cx="71" cy="42" r="2"/><circle cx="71" cy="60" r="2"/></g>' },
+  gafas: { n: 'De estreno', bg: '#9adbd0', f: '#14255c', over: '<path d="M17 33h46" stroke="#14172e" stroke-width="4"/><rect x="20" y="31" width="19" height="14" rx="6" fill="#14172e"/><rect x="41" y="31" width="19" height="14" rx="6" fill="#14172e"/><path d="M24 34l6 0M45 34l6 0" stroke="#8fd3f0" stroke-width="3" stroke-linecap="round"/>' },
+  obra: { n: 'Jefa de obra', bg: '#ffd9a0', f: '#d9691a', over: helmet('#f5b81c') },
+  reina: { n: 'Reina', bg: '#e3c7f0', f: '#7a2d8c', over: crown('#f5c518', '#c62839') },
+  platino: { n: 'Platino', bg: '#dfe6ee', f: '#8d9aac', over: crown('#e8eef5', '#38bdf8') }
+};
+const BOB = {
+  clasico: { n: 'Clásico', bg: '#d9899c', ball: '#3f4568', hl: '#8088b0' },
+  sandia: { n: 'Sandía', bg: '#f7b5bf', ball: '#3c9d4e', hl: '#a5e0ae', under: line('M28 19q-8 26 0 52M40 16v58M52 19q8 26 0 52', 4, '#27703a') },
+  pirata: { n: 'Pirata', bg: '#8fc4d6', ball: '#3f4568', hl: '#8088b0', over: '<path d="M13 33a28 28 0 0154 0q-27-9-54 0z" fill="#c62839"/><path d="M65 30l11-5-3 9 5 6-12-4z" fill="#a81d2d"/><g fill="#fff"><circle cx="28" cy="25" r="2.500"/><circle cx="40" cy="22" r="2.500"/><circle cx="52" cy="25" r="2.500"/></g><path d="M36 33l32 8" stroke="#14172e" stroke-width="3"/><circle cx="50" cy="43" r="9" fill="#14172e"/>' },
+  diablo: { n: 'Diablo', bg: '#f2b04e', ball: '#b3241f', hl: '#f08a7d', over: '<path d="M18 27Q8 16 14 4q4 12 16 15zM62 27Q72 16 66 4q-4 12-16 15z" fill="#f7e6d0" stroke="#7d1420" stroke-width="2" stroke-linejoin="round"/>' },
+  disco: { n: 'Disco', bg: '#2b1b52', ball: '#8b93c7', hl: '#fff', under: line('M12 36h56M11 47h58M15 58h50M28 19q-9 26 0 52M40 16v58M52 19q9 26 0 52', 1.6, '#d8dcff') + '<path d="M10 12l2 5 5 2-5 2-2 5-2-5-5-2 5-2z" fill="#f5e663"/><path d="M69 60l1.500 4 4 1.500-4 1.500-1.500 4-1.500-4-4-1.500 4-1.500z" fill="#6ee7f0"/>' },
+  platino: { n: 'Platino', bg: '#8d9aac', ball: '#d3dce6', hl: '#ffffff', ink: '#14255c', over: crown('#e8eef5', '#c084fc') }
+};
 // Alice es un azulejo; Bob, una bola de demolición.
-function face(who, mood) {
-  const m = mood || 'ok';
+function face(who, mood, skin) {
+  const m = mood || 'ok', K = who === 'A' ? ALICE[skin || save.skin.a] || ALICE.clasica : BOB[skin || save.skin.b] || BOB.clasico;
   let o;
   if (who === 'A') {
-    o = '<rect width="80" height="80" fill="#f7dc9a"/><rect x="9" y="13" width="62" height="62" rx="11" fill="#14255c" opacity=".22"/><rect x="9" y="9" width="62" height="62" rx="11" fill="#fbfaf5"/><rect x="9" y="9" width="62" height="62" rx="11" fill="none" stroke="#2346a8" stroke-width="6"/>'
+    o = `<rect width="80" height="80" fill="${K.bg}"/><rect x="9" y="13" width="62" height="62" rx="11" fill="#14255c" opacity=".22"/><rect x="9" y="9" width="62" height="62" rx="11" fill="#fbfaf5"/><rect x="9" y="9" width="62" height="62" rx="11" fill="none" stroke="${K.f}" stroke-width="6"/>`
       + [[21, 21], [59, 21], [21, 59], [59, 59]].map(([x, y]) => `<path d="M${x} ${y - 6}l6 6-6 6-6-6z" fill="${y < 40 ? '#f0b429' : '#57b7d6'}"/>`).join('')
       + '<circle cx="23" cy="47" r="4.500" fill="#f29c8f"/><circle cx="57" cy="47" r="4.500" fill="#f29c8f"/>';
     if (m === 'win') o += line('M25 39q6-9 12 0', 3.5) + line('M43 39q6-9 12 0', 3.5) + '<path d="M30 46h20q-1 13-10 13t-10-13z" fill="#14255c"/><path d="M34 55q6-5 12 0-2 4-6 4t-6-4z" fill="#f0685c"/>';
-    else if (m === 'bad') o += eye(31, 39, 7, 0, 1) + eye(49, 39, 7, 0, 1) + line('M24 29l9-4M56 29l-9-4', 3) + line('M34 55q6-7 12 0', 3) + '<path d="M64 20q6 9 0 12-6-3 0-12z" fill="#57b7d6"/>';
+    else if (m === 'bad') o += eye(31, 39, 7, 0, 1) + eye(49, 39, 7, 0, 1) + line('M24 29l9-4M56 29l-9-4', 3) + line('M34 55q6-7 12 0', 3) + '<path d="M64 30q6 9 0 12-6-3 0-12z" fill="#57b7d6"/>';
     else o += eye(31, 38, 7) + eye(49, 38, 7) + line('M33 51q7 6 14 0', 3);
   } else {
-    o = '<rect width="80" height="80" fill="#d9899c"/>' + line('M40 -2v16', 6, '#33385c') + '<rect x="32" y="8" width="16" height="10" rx="3" fill="#33385c"/><circle cx="40" cy="48" r="29" fill="#14255c" opacity=".22"/><circle cx="40" cy="45" r="29" fill="#3f4568"/><path d="M19 36a23 23 0 0116-14" fill="none" stroke="#8088b0" stroke-width="5" stroke-linecap="round"/>';
-    if (m === 'win') o += eye(30, 43, 7, 1, 1) + eye(50, 43, 7, -1, 1) + line('M21 32l14 7M59 32l-14 7', 4.5, '#f0b429') + '<path d="M25 54q15 5 30 0-3 14-15 14T25 54z" fill="#fff"/>' + line('M33 56.500l1 9M40 57v10M47 56.500l-1 9', 2, '#3f4568');
-    else if (m === 'bad') o += line('M25 38l9 9M34 38l-9 9M46 38l9 9M55 38l-9 9', 4, '#fff') + line('M30 62q5-6 10 0t10 0', 3.5, '#fff') + line('M52 18l-5 8 7 4-4 7', 3, '#14172e');
-    else o += eye(30, 44, 7, 1) + eye(50, 44, 7, -1) + line('M21 34l14 5M59 34l-14 5', 4.5, '#f0b429') + line('M30 60q12 5 21-4', 3.5, '#fff');
+    const ink = K.ink || '#fff', brow = K.ink || '#f0b429';
+    o = `<rect width="80" height="80" fill="${K.bg}"/>` + line('M40 -2v16', 6, '#33385c') + `<rect x="32" y="8" width="16" height="10" rx="3" fill="#33385c"/><circle cx="40" cy="48" r="29" fill="#14255c" opacity=".22"/><circle cx="40" cy="45" r="29" fill="${K.ball}"/>` + (K.under || '') + `<path d="M19 36a23 23 0 0116-14" fill="none" stroke="${K.hl}" stroke-width="5" stroke-linecap="round"/>`;
+    if (m === 'win') o += eye(30, 43, 7, 1, 1) + eye(50, 43, 7, -1, 1) + line('M21 32l14 7M59 32l-14 7', 4.5, brow) + '<path d="M25 54q15 5 30 0-3 14-15 14T25 54z" fill="#fff" stroke="#14255c" stroke-width="1"/>' + line('M33 56.500l1 9M40 57v10M47 56.500l-1 9', 2, '#3f4568');
+    else if (m === 'bad') o += line('M25 38l9 9M34 38l-9 9M46 38l9 9M55 38l-9 9', 4, ink) + line('M30 62q5-6 10 0t10 0', 3.5, ink) + line('M52 18l-5 8 7 4-4 7', 3, '#14172e');
+    else o += eye(30, 44, 7, 1) + eye(50, 44, 7, -1) + line('M21 34l14 5M59 34l-14 5', 4.5, brow) + line('M30 60q12 5 21-4', 3.5, ink);
   }
-  return '<svg viewBox="0 0 80 80" aria-hidden="true">' + o + '</svg>';
+  return '<svg viewBox="0 0 80 80" aria-hidden="true">' + o + (K.over || '') + '</svg>';
 }
 
 // ---------- guardado y sonido ----------
-let save = { stars: {}, best: 0, walls: 0, puz: {}, mute: false };
+let save = { stars: {}, best: 0, walls: 0, puz: {}, mute: false, tro: {}, skin: {}, exp: {}, cls: {}, seen: {}, run: 0, expert: false };
 try { save = Object.assign(save, JSON.parse(localStorage.getItem('zocalo-v1') || '{}')); } catch (e) {}
+save.skin = Object.assign({ t: 'triana', a: 'clasica', b: 'clasico', f: 'albero' }, save.skin);
 const store = () => { try { localStorage.setItem('zocalo-v1', JSON.stringify(save)); } catch (e) {} };
 let ac = null;
 function tone(f, t = .12, type = 'triangle', vol = .16, when = 0, to) {
@@ -1328,7 +1410,8 @@ const SND = {
   warn: () => { tone(220, .1, 'sawtooth', .08); tone(220, .1, 'sawtooth', .08, .14); },
   save: n => [0, 1, 2].forEach(i => tone(523 * (1 + i * .25) * (1 + Math.min(n, 6) * .06), .12, 'triangle', .14, i * .07)),
   crack: () => { tone(180, .5, 'sawtooth', .2, 0, 40); tone(90, .6, 'square', .12, .05, 30); },
-  win: () => [523, 659, 784, 1047].forEach((f, i) => tone(f, .22, 'triangle', .16, i * .11)), scrape: () => tone(900, .18, 'sawtooth', .06, 0, 300)
+  win: () => [523, 659, 784, 1047].forEach((f, i) => tone(f, .22, 'triangle', .16, i * .11)), trophy: p => (p ? [392, 523, 659, 784, 1047, 1319, 1568] : [659, 880, 1319]).forEach((f, i) => tone(f, p ? .5 : .24, 'triangle', .15, i * (p ? .13 : .09))),
+  scrape: () => tone(900, .18, 'sawtooth', .06, 0, 300)
 };
 
 // ---------- rivales en un worker ----------
@@ -1344,6 +1427,7 @@ try {
 } catch (e) { worker = null; }
 function ask(m) { return new Promise(r => { if (worker) { m.id = ++req; waiting[m.id] = r; worker.postMessage(m); } else setTimeout(() => r(think(m)), 20); }); }
 
+const CLASS = ['juego', 'cota', 'espejo', 'laboratorio', 'configuraciones'];
 // ---------- contenido ----------
 const LEVELS = [
   { t: 'Primera pared', role: 'A', n: 4, k: 5, ai: 0, d: 'Cinco azulejos: aprende sin miedo.' },
@@ -1365,6 +1449,142 @@ const SAY = {
   B: { idle: ['«A ver cómo sales de esta.»', '«Yo solo paso por aquí.»', '«Qué pena de pared.»'], threat: ['«¿Oyes ese crujido?»', '«Ahí, ahí…»'], win: ['«¡Crac!»'], lose: ['«Bah. Quedó bonita.»'] }
 };
 
+// ---------- trofeos ----------
+const TRO = [
+  ['pared', 1, 'Primera mano', 'Completa tu primera pared.'],
+  ['grieta', 1, 'Crac', 'Agrieta tu primera pared.'],
+  ['salvada', 1, 'Por los pelos', 'Salva un hueco en peligro.'],
+  ['doble', 1, 'Tenaza', 'Crea dos amenazas con un solo azulejo.'],
+  ['rescate', 1, 'Masilla y a correr', 'Rescata una pared agrietada con la espátula.'],
+  ['duelo', 1, 'Cara a cara', 'Termina un duelo.'],
+  ['clase', 1, 'Con apuntes', 'Visita las cinco pestañas del modo clase.'],
+  ['estreno', 1, 'Cambio de look', 'Estrena una skin.'],
+  ['campana', 2, 'Oficial de primera', 'Supera los 12 niveles de la campaña.'],
+  ['golpes', 2, 'Demolición controlada', 'Resuelve los 7 golpes maestros.'],
+  ['racha', 2, 'Nervios de acero', 'Encadena 3 salvadas en una misma pared, sin ayudas.'],
+  ['obra4', 2, 'Horas extra', 'Termina 4 paredes en una Obra sin fin.'],
+  ['rayo', 2, 'Relámpago', 'Supera «Contrarreloj» en 40 segundos, sin ayudas.'],
+  ['cuatro', 2, 'Cuatro golpes', 'En un nivel con 4 azulejos distintos, agrieta la pared colocando 4 o menos, sin Doble ni ayudas.'],
+  ['ciego', 2, 'A ojo', 'Supera un nivel en modo experto, sin ayudas.'],
+  ['una', 3, 'Con una basta', 'Supera «La última pared» gastando como mucho una espátula, sin ayudas.'],
+  ['estrellas', 3, 'Maestría', 'Consigue las 36 estrellas.'],
+  ['obra8', 3, 'El zócalo infinito', 'Termina 8 paredes en una Obra sin fin.'],
+  ['puntos', 3, 'Obra faraónica', 'Llega a 2.000 puntos en una Obra sin fin.'],
+  ['espejo', 3, 'Lema 1', 'Supera «El espejo» copiando siempre a Bob dos filas más allá, sin ayudas.'],
+  ['seguidos', 3, 'Sin respirar', 'Resuelve los 7 golpes maestros seguidos, en orden y sin fallar.'],
+  ['intocable', 3, 'Intocable', 'Supera «El zócalo largo» sin que Bob llegue a poner un hueco en peligro, sin ayudas ni espátula.'],
+  ['manos', 3, 'A mano limpia', 'Supera «Espátula en mano» sin usar la espátula ni ayudas.'],
+  ['teorema', 3, 'Contraejemplo', 'Supera «Contra el teorema» colocando 4 azulejos o menos, sin ayudas.'],
+  ['sindoble', 3, 'Sin trampas', 'Supera «Doble turno» sin gastar el Doble ni ayudas.'],
+  ['experto', 3, 'Ojos cerrados', 'Supera los 12 niveles en modo experto, sin ayudas.'],
+  ['platino', 4, 'Zócalo de platino', 'Consigue todos los demás trofeos.']
+].map(([id, tier, t, d]) => ({ id, tier, t, d }));
+const TIER = ['', ['Bronce', '#b56a35', '#e7a878'], ['Plata', '#8b97a8', '#d9e0ea'], ['Oro', '#c98a07', '#ffd95e'], ['Platino', '#4f86a8', '#cdeefb']];
+const cup = (tier, off) => `<svg viewBox="0 0 40 40" aria-hidden="true"><g fill="${off ? '#8b8fa3' : TIER[tier][1]}" opacity="${off ? .45 : 1}"><path d="M10 5h20v11a10 10 0 01-20 0z"/><path d="M17 25h6v6h-6zM11 31h18v5H11z"/><path d="M10 8H3q0 11 9 12l-1-4q-4-1-4-5h3zM30 8h7q0 11-9 12l1-4q4-1 4-5h-3z"/></g>${off ? '' : `<path d="M14 8h4v9q0 4 3 6-7-1-7-7z" fill="${TIER[tier][2]}"/>` + (tier === 4 ? '<path d="M20 9l2 4 4.500.5-3.300 3 1 4.500-4.200-2.300z" fill="#fff"/>' : '')}</svg>`;
+const troCount = () => TRO.filter(t => save.tro[t.id]).length;
+const queue = []; let showing = false;
+function award(id) {
+  if (save.tro[id]) return;
+  const t = TRO.find(x => x.id === id); if (!t) return;
+  save.tro[id] = 1; store(); queue.push({ t });
+  if (id !== 'platino' && TRO.every(x => x.id === 'platino' || save.tro[x.id])) award('platino');
+  unlocked(); toast();
+}
+function toast() {
+  if (showing || !queue.length) return;
+  showing = true; const q = queue.shift(), box = $('#z-toast'), plat = !!q.t && q.t.tier === 4;
+  box.innerHTML = q.t ? cup(q.t.tier) : q.svg;
+  const d = el('div'); d.append(el('small', null, q.t ? 'Trofeo de ' + TIER[q.t.tier][0].toLowerCase() : 'Skin desbloqueada'), el('b', null, q.t ? q.t.t : q.name)); box.appendChild(d);
+  box.hidden = false; box.classList.toggle('plat', plat);
+  if (q.t) SND.trophy(plat);
+  if (plat) rain();
+  setTimeout(() => { box.hidden = true; showing = false; toast(); }, plat ? 5000 : 2600);
+}
+function rain() {
+  if (calm) return;
+  for (let i = 0; i < 46; i++) {
+    const p = el('i', 'z-rain'); p.innerHTML = tile(1 + i % 5, 'platino'); p.style.left = Math.random() * 92 + 'vw'; document.body.appendChild(p);
+    p.animate([{ transform: 'translateY(-60px)' }, { transform: `translateY(110vh) rotate(${Math.random() * 720 - 360}deg)` }], { duration: 2200 + Math.random() * 2200, delay: Math.random() * 1500, easing: 'ease-in', fill: 'backwards' }).onfinish = () => p.remove();
+  }
+}
+const stars = () => Object.values(save.stars).reduce((a, b) => a + b, 0);
+// Trofeos que dependen del progreso acumulado.
+function meta() {
+  if (LEVELS.every((_, i) => save.stars[i])) award('campana');
+  if (stars() >= LEVELS.length * 3) award('estrellas');
+  if (PUZ.every((_, i) => save.puz[i])) award('golpes');
+  if (save.walls >= 4) award('obra4'); if (save.walls >= 8) award('obra8'); if (save.best >= 2000) award('puntos');
+  if (Object.keys(save.exp).length) award('ciego'); if (LEVELS.every((_, i) => save.exp[i])) award('experto');
+  if (CLASS.every(c => save.cls[c])) award('clase');
+  unlocked(); toast();
+}
+// Trofeos que dependen de cómo se ha jugado esta partida.
+function feats(winner, won) {
+  const o = P.o, clean = !P.helped;
+  if (o.mode === 'duel') return award('duelo');
+  if (!won) return;
+  award(winner === 'A' ? 'pared' : 'grieta');
+  if (o.mode !== 'camp' || !clean) return;
+  if (P.exp && !save.exp[o.id]) { save.exp[o.id] = 1; store(); }
+  if (P.role === 'B' && o.k === 4 && P.moves <= 4 && !P.used) award('cuatro');
+  if (o.id === 4 && Date.now() - P.t0 <= 40000) award('rayo');
+  if (o.id === 5 && !P.used) award('sindoble');
+  if (o.id === 6 && P.mirror) award('espejo');
+  if (o.id === 8 && !P.used) award('manos');
+  if (o.id === 9 && P.moves <= 4) award('teorema');
+  if (o.id === 10 && !P.used && !P.danger) award('intocable');
+  if (o.id === 11 && P.used <= 1) award('una');
+}
+
+// ---------- skins ----------
+const FONDOS = { albero: 'Albero', patio: 'Patio', atardecer: 'Atardecer', medianoche: 'Medianoche', platino: 'Platino' };
+const NEED = {
+  t: { mudejar: ['12 estrellas', () => stars() >= 12], frutas: ['Trofeo «Horas extra»', 'obra4'], pixel: ['Trofeo «Demolición controlada»', 'golpes'], neon: ['Trofeo «A ojo»', 'ciego'], platino: ['El platino', 'platino'] },
+  a: { flamenca: ['6 estrellas', () => stars() >= 6], gafas: ['Trofeo «Relámpago»', 'rayo'], obra: ['Trofeo «El zócalo infinito»', 'obra8'], reina: ['Trofeo «Maestría»', 'estrellas'], platino: ['El platino', 'platino'] },
+  b: { sandia: ['Trofeo «Tenaza»', 'doble'], pirata: ['Trofeo «Cuatro golpes»', 'cuatro'], diablo: ['Trofeo «Sin trampas»', 'sindoble'], disco: ['Trofeo «Sin respirar»', 'seguidos'], platino: ['El platino', 'platino'] },
+  f: { patio: ['5 trofeos', () => troCount() >= 5], atardecer: ['10 trofeos', () => troCount() >= 10], medianoche: ['18 trofeos', () => troCount() >= 18], platino: ['El platino', 'platino'] }
+};
+const CAT = { t: ['Azulejos', SETS], a: ['Alice', ALICE], b: ['Bob', BOB], f: ['Fondo', FONDOS] };
+const isOpen = (c, id) => { const q = NEED[c][id]; return !q || (typeof q[1] === 'string' ? !!save.tro[q[1]] : q[1]()); };
+const skinName = (c, id) => c === 'f' ? FONDOS[id] : CAT[c][1][id].n;
+const skinArt = (c, id) => c === 't' ? `<span class="z-four">${[1, 2, 3, 4].map(k => tile(k, id)).join('')}</span>` : c === 'f' ? `<span class="z-swatch" data-zt="${id}"></span>` : face(c === 'a' ? 'A' : 'B', 'ok', id);
+const allSkins = () => Object.keys(CAT).flatMap(c => Object.keys(CAT[c][1]).map(id => [c, id]));
+function unlocked() {
+  let n = 0;
+  for (const [c, id] of allSkins()) if (NEED[c][id] && !save.seen[c + id] && isOpen(c, id)) { save.seen[c + id] = 1; n++; queue.push({ svg: `<span class="z-prev">${skinArt(c, id)}</span>`, name: CAT[c][0] + ': ' + skinName(c, id) }); }
+  if (n) store();
+}
+function wear() { for (const c in CAT) if (!CAT[c][1][save.skin[c]] || !isOpen(c, save.skin[c])) save.skin[c] = Object.keys(CAT[c][1])[0]; document.body.dataset.zt = save.skin.f; $('#z-cast').innerHTML = face('A', 'ok') + face('B', 'win'); }
+function drawSkins() {
+  const host = $('#z-skins'); host.innerHTML = '';
+  for (const c in CAT) {
+    const box = el('div', 'z-field'); box.appendChild(el('h3', null, CAT[c][0])); const grid = el('div', 'z-sk'); box.appendChild(grid);
+    for (const id in CAT[c][1]) {
+      const ok = isOpen(c, id), on = save.skin[c] === id, b = el('button', 'z-skb' + (on ? ' on' : '') + (ok ? '' : ' no')); b.type = 'button'; b.disabled = !ok; b.setAttribute('aria-pressed', on);
+      b.innerHTML = `<span class="z-prev">${skinArt(c, id)}</span>`; b.append(el('b', null, skinName(c, id)), el('small', null, on ? 'Puesta' : ok ? 'Poner' : NEED[c][id][0]));
+      b.addEventListener('click', () => { if (save.skin[c] === id) return; save.skin[c] = id; store(); wear(); award('estreno'); SND.place(4); drawSkins(); });
+      grid.appendChild(b);
+    }
+    host.appendChild(box);
+  }
+}
+function drawTro() {
+  const n = troCount(), host = $('#z-tros'); host.innerHTML = '';
+  $('#z-tro-sub').textContent = `${n} de ${TRO.length} trofeos`; $('#z-tro-bar').style.width = n / TRO.length * 100 + '%';
+  const PROG = { campana: () => [LEVELS.filter((_, i) => save.stars[i]).length, 12], estrellas: () => [stars(), 36], golpes: () => [PUZ.filter((_, i) => save.puz[i]).length, 7], obra4: () => [Math.min(4, save.walls), 4], obra8: () => [Math.min(8, save.walls), 8], puntos: () => [Math.min(2000, save.best), 2000], experto: () => [Object.keys(save.exp).length, 12], clase: () => [CLASS.filter(c => save.cls[c]).length, 5], platino: () => [n, TRO.length - 1] };
+  for (const tier of [4, 3, 2, 1]) {
+    const list = TRO.filter(t => t.tier === tier), box = el('div', 'z-field');
+    box.appendChild(el('h3', null, `${TIER[tier][0]} (${list.filter(t => save.tro[t.id]).length}/${list.length})`));
+    const grid = el('div', 'z-levels'); box.appendChild(grid);
+    for (const t of list) {
+      const ok = save.tro[t.id], c = el('div', 'z-tro' + (ok ? '' : ' no')); c.innerHTML = cup(tier, !ok);
+      const x = el('div'); x.append(el('b', null, t.t), el('span', null, t.d)); const p = !ok && PROG[t.id] && PROG[t.id](); if (p) x.appendChild(el('small', null, `${p[0]} / ${p[1]}`)); else if (ok) x.appendChild(el('small', null, 'Conseguido'));
+      c.appendChild(x); grid.appendChild(c);
+    }
+    host.appendChild(box);
+  }
+}
+
 // ---------- partida ----------
 let P = null, tick = 0, coach = 0;
 const other = w => w === 'A' ? 'B' : 'A';
@@ -1375,7 +1595,7 @@ function start(o) {
   clearInterval(tick);
   const g = E.board(o.n, o.k);
   P = { o, g, s: o.s ? Uint8Array.from(o.s, Number) : new Uint8Array(g.cells), role: o.role, turn: o.first || 'A', sel: -1, pow: o.pow || 0, hints: 3, armed: false, scrape: false, rescue: false,
-    score: o.score || 0, combo: 0, moves: 0, helped: false, over: false, busy: false, epoch: (P ? P.epoch : 0) + 1, hist: [], last: -1, mood: { A: 'ok', B: 'ok' }, hint: null, t0: Date.now(), focus: 0 };
+    score: o.score || 0, combo: 0, moves: 0, helped: false, over: false, busy: false, epoch: (P ? P.epoch : 0) + 1, hist: [], last: -1, mood: { A: 'ok', B: 'ok' }, hint: null, t0: Date.now(), focus: 0, used: 0, danger: 0, mirror: true, exp: o.mode === 'camp' && save.expert };
   coach = o.id === 0 && !save.stars[0] ? 1 : 0;
   show('play'); $('#z-over').hidden = true;
   $('#z-title').textContent = o.t;
@@ -1392,11 +1612,11 @@ function fit() {
 function cellHTML(v, showDots) {
   if (P.s[v]) return tile(P.s[v]);
   if (!showDots) return '';
-  return '<span class="dots">' + avail(v).map(c => `<i style="background:${HEX[c]}"></i>`).join('') + '</span>';
+  return '<span class="dots">' + avail(v).map(c => `<i style="background:${hex(c)}"></i>`).join('') + '</span>';
 }
 function draw() {
   fit();
-  const W = $('#z-wall'), n = P.g.n, vic = P.over ? new Set() : victims(), dead = new Set(E.deadCells(P.g, P.s));
+  const W = $('#z-wall'), n = P.g.n, vic = P.over || P.exp ? new Set() : victims(), dead = new Set(E.deadCells(P.g, P.s));
   if (W.children.length !== P.g.cells || W.dataset.n !== String(n)) {
     W.dataset.n = n; W.innerHTML = '';
     for (let r = 3; r >= 0; r--) for (let c = 0; c < n; c++) { const b = el('button', 'z-cell'); b.type = 'button'; b.dataset.v = r * n + c; W.appendChild(b); }
@@ -1404,7 +1624,7 @@ function draw() {
   for (const b of W.children) {
     const v = +b.dataset.v, e = !P.s[v];
     b.className = 'z-cell' + (v === P.last ? ' last' : '') + (v === P.pop ? ' pop' : '') + (vic.has(v) ? ' warn' : '') + (dead.has(v) ? ' dead' : '') + (P.hint && P.hint[0] === v ? ' hint' : '') + (v === P.sel ? ' sel' : '') + (scrapable(v) ? ' scr' : '');
-    b.innerHTML = cellHTML(v, true);
+    b.innerHTML = cellHTML(v, !P.exp);
     b.setAttribute('aria-label', `Fila ${Math.floor(v / n) + 1}, columna ${v % n + 1}: ` + (e ? (dead.has(v) ? 'agrietado' : 'hueco' + (vic.has(v) ? ' en peligro' : '')) : NAMES[P.s[v]]));
   }
   P.pop = -1;
@@ -1452,6 +1672,7 @@ function human(v, c) {
 function play(v, c) {
   const w = P.turn, mine = P.role !== '2' && P.role === w, before = victims();
   clearInterval(tick);
+  if (w === 'A' && mine) { const m = P.last >= 0 && P.hist.length && P.hist[P.hist.length - 1].w === 'B' ? E.mirror(P.g, P.s, [P.last, P.s[P.last]]) : null; if (!m || m[0] !== v || m[1] !== c) P.mirror = false; }
   P.hist.push({ s: P.s.slice(), w, pow: P.pow, score: P.score, combo: P.combo, moves: P.moves, last: P.last });
   P.s[v] = c; P.last = v; P.pop = v; P.sel = -1; P.hint = null; P.mood = { A: 'ok', B: 'ok' };
   SND.place(c); if (mine) { P.moves++; P.score += 10; }
@@ -1462,12 +1683,13 @@ function play(v, c) {
   const after = victims(), fresh = [...after].filter(x => !before.has(x)).length;
   if (w === 'A') {
     if (before.size && !after.size) {
-      if (mine) { P.combo++; const pts = 40 * P.combo; P.score += pts; pop(P.combo > 1 ? `¡Salvada ×${P.combo}! +${pts}` : `¡Salvada! +${pts}`); }
+      if (mine) { P.combo++; award('salvada'); if (P.combo >= 3 && !P.helped) award('racha'); const pts = 40 * P.combo; P.score += pts; pop(P.combo > 1 ? `¡Salvada ×${P.combo}! +${pts}` : `¡Salvada! +${pts}`); }
       P.mood = { A: 'win', B: 'bad' }; SND.save(P.combo); say(mine ? 'La has salvado por los pelos.' : '«¡De eso nada!»');
-    } else if (after.size && mine) say('Cuidado: queda un hueco en peligro.');
+    } else if (after.size && mine && !P.exp) say('Cuidado: queda un hueco en peligro.');
   } else if (fresh) {
-    if (mine) { const pts = fresh > 1 ? 120 : 40; P.score += pts; pop(fresh > 1 ? `¡Doble amenaza! +${pts}` : `¡Amenaza! +${pts}`); } else pop('¡Peligro!', true);
-    P.mood = { A: 'bad', B: 'win' }; SND.warn(); say(mine ? 'Ese hueco está a una jugada de agrietarse.' : pick(SAY.B.threat));
+    P.danger++;
+    if (mine) { const pts = fresh > 1 ? 120 : 40; P.score += pts; if (fresh > 1) award('doble'); pop(fresh > 1 ? `¡Doble amenaza! +${pts}` : `¡Amenaza! +${pts}`); } else if (!P.exp) pop('¡Peligro!', true);
+    if (mine || !P.exp) { P.mood = { A: 'bad', B: 'win' }; SND.warn(); say(mine ? 'Ese hueco está a una jugada de agrietarse.' : pick(SAY.B.threat)); }
   }
   if (w === 'B' && P.armed) { P.armed = false; say('Doble: coloca otro azulejo.'); return draw(), next(true); }
   P.turn = other(w);
@@ -1523,10 +1745,10 @@ function crack(w) {
 function scrape(v) {
   const was = P.rescue;
   P.hist.push({ s: P.s.slice(), w: 'A', pow: P.pow, score: P.score, combo: P.combo, moves: P.moves, last: P.last });
-  P.s[v] = 0; P.pow--; P.scrape = false; P.last = -1; SND.scrape();
+  P.s[v] = 0; P.pow--; P.used++; P.scrape = false; P.last = -1; SND.scrape();
   if (E.deadCells(P.g, P.s).length) { if (P.pow > 0) { P.rescue = true; say('Sigue agrietada: quita otro azulejo.'); return draw(); } return lose(); }
   P.rescue = false; P.mood = { A: 'ok', B: 'bad' };
-  if (was) { pop('¡Rescatada!'); SND.save(2); }
+  if (was) { award('rescate'); pop('¡Rescatada!'); SND.save(2); }
   say('Sigue siendo tu turno.'); draw(); if (P.o.clock) startClock();
 }
 const lose = () => { P.rescue = false; finish('B'); };
@@ -1546,7 +1768,7 @@ function bits(v, c) {
   if (calm) return;
   const b = $(`#z-wall [data-v="${v}"]`); if (!b) return;
   for (let i = 0; i < 8; i++) {
-    const p = el('i', 'z-bit'); p.style.background = HEX[c];
+    const p = el('i', 'z-bit'); p.style.background = hex(c);
     p.style.left = 6 + b.offsetLeft + b.offsetWidth / 2 + 'px'; p.style.top = 6 + b.offsetTop + b.offsetHeight / 2 + 'px';
     $('#z-box').appendChild(p); const a = Math.random() * 6.28, d = 26 + Math.random() * 34;
     p.animate([{ transform: 'none', opacity: 1 }, { transform: `translate(${Math.cos(a) * d}px,${Math.sin(a) * d + 18}px) rotate(200deg) scale(.3)`, opacity: 0 }], { duration: 480, easing: 'ease-out' }).onfinish = () => p.remove();
@@ -1572,14 +1794,15 @@ function result(winner, won) {
     if (won && o.id + 1 < LEVELS.length) buttons.push(['Siguiente nivel', () => startLevel(o.id + 1)]);
     buttons.push([won ? 'Repetir' : 'Otra vez', () => startLevel(o.id)], ['Niveles', () => go('map')]);
   } else if (o.mode === 'endless') {
-    if (won) { const w = o.wall + 1; O(`Pared ${w} lista`, `${P.score} puntos. La siguiente es más difícil.`); buttons.push(['Siguiente pared', () => startWall(w, P.score, Math.min(3, P.pow + (w % 2 === 0 ? 1 : 0)))]); }
+    if (won) { const w = o.wall + 1; save.walls = Math.max(save.walls, w); save.best = Math.max(save.best, P.score); store(); O(`Pared ${w} lista`, `${P.score} puntos. La siguiente es más difícil.`); buttons.push(['Siguiente pared', () => startWall(w, P.score, Math.min(3, P.pow + (w % 2 === 0 ? 1 : 0)))]); }
     else {
-      const rec = P.score > save.best; save.best = Math.max(save.best, P.score); save.walls = Math.max(save.walls, o.wall); store();
+      const rec = P.score > (o.rec || 0); save.best = Math.max(save.best, P.score); save.walls = Math.max(save.walls, o.wall); store();
       O(rec ? '¡Récord!' : 'Fin de la obra', `${P.score} puntos y ${o.wall} ${o.wall === 1 ? 'pared' : 'paredes'}. Tu mejor marca: ${save.best}.`);
       buttons.push(['Otra vez', () => startWall(0, 0, 2)], ['Copiar marca', b => copy(`Zócalo: ${P.score} puntos y ${o.wall} paredes en la Obra sin fin. ¿Me superas?`, b)], ['Inicio', () => go('home')]);
     }
   } else if (o.mode === 'puz') {
-    if (won) { save.puz[o.id] = 1; store(); }
+    if (won) { save.puz[o.id] = 1; save.run = o.id === save.run ? save.run + 1 : o.id === 0 ? 1 : 0; if (save.run === PUZ.length) award('seguidos'); } else save.run = 0;
+    store();
     O(won ? '¡Golpe maestro!' : 'La pared aguanta', won ? 'Cada amenaza obligó a Alice a responder.' : `Había solución en ${o.d} jugadas. Empieza por una amenaza.`);
     if (won && o.id + 1 < PUZ.length) buttons.push(['Siguiente', () => startPuz(o.id + 1)]);
     buttons.push([won ? 'Repetir' : 'Otra vez', () => startPuz(o.id)], ['Problemas', () => go('puz')]);
@@ -1587,6 +1810,7 @@ function result(winner, won) {
     O(winner === 'A' ? 'Gana Alice' : 'Gana Bob', winner === 'A' ? 'La pared está completa.' : 'La pared se ha agrietado.');
     buttons.push(['Revancha', () => start(o)], ['Cambiar', () => go('duel')]);
   }
+  feats(winner, won); meta();
   const S = $('#z-o-s'); S.hidden = o.mode !== 'camp' || !won; S.innerHTML = ''; S.setAttribute('aria-label', stars + ' de 3 estrellas');
   for (let i = 0; i < 3; i++) { const b = el(i < stars ? 'b' : 'span', null, '★'); b.style.animationDelay = i * .18 + 's'; S.appendChild(b); }
   const G = $('#z-o-g'); G.innerHTML = ''; G.hidden = !goals.length;
@@ -1602,7 +1826,8 @@ function copy(t, b) {
 
 // ---------- modos ----------
 const startLevel = i => start(Object.assign({ mode: 'camp', id: i }, LEVELS[i]));
-const startWall = (w, score, pow) => start({ mode: 'endless', wall: w, score, pow, t: `Pared ${w + 1}`, role: 'A', n: Math.min(4 + w, 9), k: 4, ai: w < 2 ? 0 : w < 4 ? 1 : 2, clock: Math.max(5, 16 - w) });
+let recBase = 0;
+const startWall = (w, score, pow) => start({ mode: 'endless', wall: w, score, pow, rec: w ? recBase : (recBase = save.best), t: `Pared ${w + 1}`, role: 'A', n: Math.min(4 + w, 9), k: 4, ai: w < 2 ? 0 : w < 4 ? 1 : 2, clock: Math.max(5, 16 - w) });
 const startPuz = i => start(Object.assign({ mode: 'puz', id: i, t: `Golpe ${i + 1}`, role: 'B', first: 'B', ai: 2 }, PUZ[i]));
 const duel = { k: 4, n: 6 };
 function chips(host, list, key) {
@@ -1620,12 +1845,16 @@ function go(s) {
     $('#z-play').textContent = nextLv < 0 ? 'Jugar: Obra sin fin' : total ? `Seguir: nivel ${nextLv + 1}` : 'Jugar';
     $('#z-play').onclick = () => nextLv < 0 ? go('endless') : startLevel(nextLv);
   }
+  if (s === 'home') { $('#z-t-sub').textContent = save.tro.platino ? '¡Platino conseguido!' : `${troCount()} de ${TRO.length}`; $('#z-k-sub').textContent = `${allSkins().filter(x => isOpen(...x)).length} de ${allSkins().length} skins`; }
+  if (s === 'tro') drawTro();
+  if (s === 'skins') drawSkins();
   if (s === 'map') {
+    const xb = $('#z-exp'); xb.className = 'z-chip' + (save.expert ? ' on' : ''); xb.textContent = 'Modo experto: ' + (save.expert ? 'sí' : 'no'); xb.setAttribute('aria-pressed', save.expert);
     $('#z-map-sub').textContent = `${total} de ${LEVELS.length * 3} estrellas. En azul juegas con Alice; en granate, con Bob.`;
     const H = $('#z-levels'); H.innerHTML = '';
     LEVELS.forEach((l, i) => {
-      const open = i === 0 || save.stars[i - 1] || save.stars[i], b = el('button', 'z-lv' + (l.role === 'B' ? ' bob' : '')); b.type = 'button'; b.disabled = !open;
-      b.appendChild(el('em', null, i + 1)); const t = el('strong', null, l.t); t.appendChild(el('i', null, open ? starText(save.stars[i] || 0) : 'cerrado')); b.append(t, el('span', null, l.d));
+      const unl = i === 0 || save.stars[i - 1] || save.stars[i], b = el('button', 'z-lv' + (l.role === 'B' ? ' bob' : '')); b.type = 'button'; b.disabled = !unl;
+      b.appendChild(el('em', null, i + 1)); const t = el('strong', null, l.t); t.appendChild(el('i', null, unl ? starText(save.stars[i] || 0) + (save.exp[i] ? ' ◆' : '') : 'cerrado')); b.append(t, el('span', null, l.d));
       b.addEventListener('click', () => startLevel(i)); H.appendChild(b);
     });
   }
@@ -1639,7 +1868,7 @@ function go(s) {
   }
   show(s);
 }
-function show(s) { $$('#z .z-screen').forEach(x => { x.hidden = x.dataset.s !== s; }); window.scrollTo(0, 0); demoOn(s === 'home'); }
+function show(s) { $$('#z .z-screen[data-s]').forEach(x => { x.hidden = x.dataset.s !== s; }); window.scrollTo(0, 0); demoOn(s === 'home'); }
 
 // ---------- pared de la portada ----------
 let demo = null;
@@ -1658,14 +1887,15 @@ function demoOn(on) {
 // ---------- controles ----------
 $('#z-wall').addEventListener('click', e => { const b = e.target.closest('.z-cell'); if (b) tapCell(+b.dataset.v); });
 $$('#z [data-go]').forEach(b => b.addEventListener('click', () => go(b.dataset.go)));
-$('#z-exit').addEventListener('click', () => go(P.o.mode === 'camp' ? 'map' : P.o.mode === 'puz' ? 'puz' : P.o.mode === 'duel' ? 'duel' : 'home'));
-$('#z-again').addEventListener('click', () => start(P.o));
+const quit = () => { if (P && P.o.mode === 'puz' && !P.over && P.moves) { save.run = 0; store(); } };
+$('#z-exit').addEventListener('click', () => { quit(); go(P.o.mode === 'camp' ? 'map' : P.o.mode === 'puz' ? 'puz' : P.o.mode === 'duel' ? 'duel' : 'home'); });
+$('#z-again').addEventListener('click', () => { quit(); start(P.o); });
 $('#z-d-go').addEventListener('click', () => start({ mode: 'duel', t: 'Duelo', role: '2', n: duel.n, k: duel.k, ai: 0 }));
 $('#z-pow').addEventListener('click', () => {
   if (!myTurn()) return;
   if (P.role === 'A') { P.scrape = !P.scrape; P.sel = -1; say(P.scrape ? 'Toca el azulejo que quieres quitar.' : 'Espátula guardada.'); }
-  else if (P.armed) { P.armed = false; P.pow++; say('Doble guardado.'); }
-  else { P.armed = true; P.pow--; say('Doble listo: colocarás dos azulejos seguidos.'); }
+  else if (P.armed) { P.armed = false; P.pow++; P.used--; say('Doble guardado.'); }
+  else { P.armed = true; P.pow--; P.used++; say('Doble listo: colocarás dos azulejos seguidos.'); }
   draw();
 });
 $('#z-hint').addEventListener('click', () => {
@@ -1682,6 +1912,7 @@ $('#z-undo').addEventListener('click', () => {
   P.s = h.s; P.turn = h.w; P.score = h.score; P.combo = h.combo; P.moves = h.moves; P.last = h.last; P.pow = h.pow; P.rescue = false; P.scrape = false; P.armed = false; P.sel = -1; P.hint = null; P.helped = true; P.mood = { A: 'ok', B: 'ok' };
   say('Jugada deshecha.'); draw(); next();
 });
+$('#z-exp').addEventListener('click', () => { save.expert = !save.expert; store(); go('map'); });
 const muteUI = () => $$('.z-mutebtn').forEach(b => { b.textContent = 'Sonido: ' + (save.mute ? 'no' : 'sí'); });
 $$('.z-mutebtn').forEach(b => b.addEventListener('click', () => { save.mute = !save.mute; store(); muteUI(); if (!save.mute) SND.place(3); }));
 document.addEventListener('keydown', e => {
@@ -1691,16 +1922,14 @@ document.addEventListener('keydown', e => {
   else if (/^[1-5]$/.test(e.key) && +e.key <= P.g.k && P.sel >= 0) human(P.sel, +e.key);
 });
 addEventListener('resize', () => { fit(); if (!$('[data-s=home]').hidden && !$('#z').hidden) demoOn(true); });
-const CLASS = ['juego', 'cota', 'espejo', 'laboratorio', 'configuraciones'];
 function mode() {
   const cls = CLASS.includes(location.hash.slice(1));
   $('#z').hidden = cls; $('#clase').hidden = !cls; document.body.classList.toggle('z-on', !cls);
-  if (cls) { clearInterval(demo); clearInterval(tick); if (P) { P.epoch++; P.over = true; } } else go('home');
+  if (cls) { save.cls[location.hash.slice(1)] = 1; store(); meta(); clearInterval(demo); clearInterval(tick); if (P) { P.epoch++; P.over = true; } } else go('home');
 }
 addEventListener('hashchange', mode);
-$('#z-cast').innerHTML = face('A', 'ok') + face('B', 'win');
-muteUI(); mode();
-window.Zocalo = { get P() { return P; }, play: (v, c) => human(v, c), tap: tapCell, go, startLevel, startPuz, startWall, LEVELS, PUZ, draw };
+wear(); muteUI(); mode(); meta();
+window.Zocalo = { get P() { return P; }, play: (v, c) => human(v, c), tap: tapCell, go, startLevel, startPuz, startWall, LEVELS, PUZ, TRO, CAT, draw, award, get save() { return save; } };
 })();
 </script>
 </body></html>
