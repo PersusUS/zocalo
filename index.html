@@ -1,0 +1,1706 @@
+<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' rx='8' fill='%232346a8'/%3E%3Cpath d='M20 4l4.5 11.5L36 20l-11.5 4.5L20 36l-4.500-11.5L4 20l11.5-4.5z' fill='%23fbfaf5'/%3E%3C/svg%3E"><meta name="description" content="Alice alicata la pared. Bob quiere agrietarla. El juego de coloracion en rejillas 4xn."><meta name="theme-color" content="#e7a838"><style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui,sans-serif}[hidden]{display:none!important}</style></head><body><title>Zócalo</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Caprasimo&family=Figtree:wght@500;600;700&family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: cuaderno de papel cuadriculado; cabecera con el teorema, pestañas por parte del artículo, rejilla protagonista y panel de explicación al lado. */
+:root {
+  --bg: #f5f7fb; --paper: #ffffff; --grid: #e3e8f2; --ink: #1d2433; --muted: #5d6779; --line: #c9d1e0;
+  --accent: #2f55d4; --accent-soft: #e4eafc;
+  --c1: #e2603f; --c2: #1f9a8a; --c3: #d9a514; --c4: #5b5fc7; --c5: #b0457a;
+  --safe: #2e9d5b; --sound: #d78b12; --danger: #d6334a; --dangerbg: #ffd9de; --unk: #eef1f6;
+  --display: 'Space Grotesk', 'Segoe UI', system-ui, sans-serif;
+  --body: 'Inter', 'Segoe UI', system-ui, sans-serif;
+  --mono: 'JetBrains Mono', Consolas, monospace;
+  --cell: clamp(28px, 7.4vw, 42px);
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #12151c; --paper: #1a1f29; --grid: #222937; --ink: #e8ecf4; --muted: #9aa4b6; --line: #394357;
+  --accent: #7c9bff; --accent-soft: #232d4a;
+  --c1: #f0805f; --c2: #3cc1ae; --c3: #f0c23c; --c4: #8a8ef2; --c5: #dd6fa4;
+  --safe: #5ccf8a; --sound: #f2ad3d; --danger: #ff6b7e; --dangerbg: #4a2028; --unk: #232a37; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #12151c; --paper: #1a1f29; --grid: #222937; --ink: #e8ecf4; --muted: #9aa4b6; --line: #394357;
+  --accent: #7c9bff; --accent-soft: #232d4a;
+  --c1: #f0805f; --c2: #3cc1ae; --c3: #f0c23c; --c4: #8a8ef2; --c5: #dd6fa4;
+  --safe: #5ccf8a; --sound: #f2ad3d; --danger: #ff6b7e; --dangerbg: #4a2028; --unk: #232a37; color-scheme: dark }
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font: 15px/1.55 var(--body);
+  background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 24px 24px; }
+.wrap { max-width: 1120px; margin: 0 auto; padding-block: 24px 48px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+h1, h2, h3 { font-family: var(--display); text-wrap: balance; margin: 0; }
+h1 { font-size: clamp(26px, 4.4vw, 40px); line-height: 1.1; }
+h2 { font-size: 22px; }
+h3 { font-size: 16px; }
+p { margin: 0; max-width: 68ch; }
+.mono, code { font-family: var(--mono); font-size: .92em; }
+header.top { display: grid; gap: 14px; margin-bottom: 18px; }
+.eyebrow { font: 600 12px/1 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--accent); }
+.thm { background: var(--paper); border: 1px solid var(--line); border-left: 4px solid var(--accent); padding: 12px 16px; border-radius: 6px; max-width: 760px; }
+.thm b { font-family: var(--display); }
+nav.tabs { display: flex; flex-wrap: wrap; gap: 6px; margin: 18px 0 16px; }
+nav.tabs a { text-decoration: none; color: var(--ink); background: var(--paper); border: 1px solid var(--line); padding: 7px 12px; border-radius: 999px; font-weight: 500; font-size: 14px; }
+nav.tabs a[aria-current="page"] { background: var(--accent); color: var(--paper); border-color: var(--accent); }
+nav.tabs a:focus-visible, button:focus-visible, select:focus-visible, input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+section.view { display: grid; gap: 16px; }
+.sheet { background: var(--paper); border: 1px solid var(--line); border-radius: 8px; padding: 16px; display: grid; gap: 12px; min-width: 0; }
+.two { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); gap: 16px; align-items: start; }
+@media (max-width: 820px) { .two { grid-template-columns: 1fr; } }
+.controls { display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; }
+.controls label { display: flex; gap: 6px; align-items: center; font-size: 14px; color: var(--muted); }
+select, input[type=range] { font: inherit; }
+select { background: var(--paper); color: var(--ink); border: 1px solid var(--line); border-radius: 6px; padding: 4px 6px; }
+button { font: 500 14px var(--body); color: var(--ink); background: var(--paper); border: 1px solid var(--line); border-radius: 6px; padding: 6px 12px; cursor: pointer; }
+button.primary { background: var(--accent); color: var(--paper); border-color: var(--accent); }
+button:disabled { opacity: .45; cursor: default; }
+.palette { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+.swatch { width: 34px; height: 34px; border-radius: 8px; border: 2px solid transparent; color: #fff; font: 600 15px var(--mono); padding: 0; }
+.swatch[aria-pressed="true"] { border-color: var(--ink); box-shadow: 0 0 0 2px var(--paper) inset; }
+.swatch.erase { background: var(--paper); color: var(--muted); border-color: var(--line); }
+.swatch.erase[aria-pressed="true"] { border-color: var(--ink); }
+.status { font-weight: 600; padding: 8px 12px; border-radius: 6px; background: var(--accent-soft); }
+.status.win { background: color-mix(in srgb, var(--safe) 18%, var(--paper)); }
+.status.lose { background: var(--dangerbg); }
+.scroll { overflow-x: auto; padding-bottom: 4px; }
+.board { display: inline-grid; gap: 0; position: relative; user-select: none; }
+.board .lab { font: 500 11px var(--mono); color: var(--muted); display: flex; align-items: center; justify-content: center; height: 20px; }
+.board .rlab { width: 26px; height: var(--cell); }
+.cell { width: var(--cell); height: var(--cell); border: 1px solid var(--line); margin: -1px 0 0 -1px; display: grid; place-items: center; position: relative;
+  font: 600 15px var(--mono); color: #fff; background: var(--paper); padding: 0; border-radius: 0; cursor: pointer; }
+.cell.ro { cursor: default; }
+.cell.k0 { color: var(--muted); }
+.cell .dots { position: absolute; inset: auto 2px 2px 2px; display: flex; gap: 2px; justify-content: center; }
+.cell .dots i { width: 5px; height: 5px; border-radius: 50%; display: block; }
+.cell.st-safe { box-shadow: inset 0 0 0 3px color-mix(in srgb, var(--safe) 55%, transparent); }
+.cell.st-sound { background: color-mix(in srgb, var(--sound) 22%, var(--paper)); }
+.cell.st-danger { background: var(--dangerbg); }
+.cell.dead { background: var(--danger) !important; color: #fff; }
+.cell.hl { outline: 3px solid var(--accent); outline-offset: -4px; z-index: 2; }
+.cell.doc { outline: 3px dashed var(--sound); outline-offset: -4px; z-index: 2; }
+.cell.sel { outline: 3px solid var(--ink); outline-offset: -4px; z-index: 3; }
+.cell.last::after { content: ""; position: absolute; top: 3px; right: 3px; width: 6px; height: 6px; border-radius: 50%; background: var(--ink); opacity: .7; }
+.cfglab { font: 600 12px var(--mono); color: var(--accent); height: 20px; display: flex; align-items: center; justify-content: center; }
+.legend { display: flex; flex-wrap: wrap; gap: 8px 16px; font-size: 13px; color: var(--muted); }
+.legend span { display: inline-flex; gap: 6px; align-items: center; }
+.legend .sw { width: 16px; height: 16px; border: 1px solid var(--line); display: inline-block; }
+.steps { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.steptext { min-height: 96px; }
+.steptext p + p { margin-top: 8px; }
+.counter { font: 500 13px var(--mono); color: var(--muted); }
+.note { font-size: 13px; color: var(--muted); }
+.insp dl { display: grid; grid-template-columns: auto 1fr; gap: 4px 12px; margin: 0; font-size: 14px; }
+.insp dt { color: var(--muted); }
+.insp dd { margin: 0; min-width: 0; overflow-wrap: anywhere; }
+.chip { display: inline-block; font: 600 12px var(--mono); padding: 2px 8px; border-radius: 999px; background: var(--accent-soft); color: var(--accent); }
+.chip.safe { background: color-mix(in srgb, var(--safe) 18%, var(--paper)); color: var(--safe); }
+.chip.sound { background: color-mix(in srgb, var(--sound) 18%, var(--paper)); color: var(--sound); }
+.chip.danger { background: var(--dangerbg); color: var(--danger); }
+.gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr)); gap: 14px; }
+.gcard { background: var(--paper); border: 1px solid var(--line); border-radius: 8px; padding: 14px; display: grid; gap: 10px; align-content: start; min-width: 0; }
+.mini { display: inline-grid; gap: 0; }
+.mini div { width: 30px; height: 30px; display: grid; place-items: center; font: 600 13px var(--mono); border: 1px solid var(--line); margin: -1px 0 0 -1px; color: #fff; }
+.mini div.out { border-style: dotted; }
+.mini div.unk { background: var(--unk); }
+.mini div.zero { color: var(--muted); background: var(--paper); }
+.mini div.sick { background: var(--dangerbg); color: var(--danger); }
+.mini div.lab { border: 0; color: var(--muted); font-weight: 500; height: 18px; }
+.mini div.tiny { font-size: 8px; color: var(--muted); }
+.retos { display: grid; gap: 8px; }
+.reto { display: flex; gap: 10px; align-items: center; justify-content: space-between; border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; background: var(--paper); }
+.reto.done { border-color: var(--safe); background: color-mix(in srgb, var(--safe) 10%, var(--paper)); }
+.reto b { display: block; font-family: var(--display); }
+.reto span.note { display: block; }
+.reto .mark { font: 600 18px var(--mono); color: var(--safe); min-width: 1.2em; text-align: center; }
+.welcome { display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; justify-content: space-between; background: var(--accent-soft); border: 1px solid var(--line); border-radius: 8px; padding: 10px 14px; }
+.welcome[hidden] { display: none; }
+.thinking { display: inline-block; animation: blink 1s infinite; }
+@keyframes blink { 50% { opacity: .35; } }
+@media (prefers-reduced-motion: reduce) { .thinking { animation: none; } }
+ul.plain { margin: 0; padding-left: 18px; display: grid; gap: 4px; max-width: 68ch; }
+@media (prefers-reduced-motion: no-preference) { .cell { transition: background-color .25s; } }
+</style>
+
+<div class="wrap" id="clase" hidden>
+  <p style="margin-bottom:14px"><a href="#inicio" style="color:var(--accent);font-weight:600">← Volver al juego</a></p>
+  <header class="top">
+    <span class="eyebrow">Brosse, Martins, Nisse, Sampaio · LAGOS 2025</span>
+    <h1>El juego de coloración en rejillas 4 × n</h1>
+    <div class="thm"><b>Teorema 1.</b> Para todo <i>n</i> ≥ 1, χ<sub>g</sub>(P<sub>4</sub>□P<sub>n</sub>) ≤ 4, y para <i>n</i> ≥ 18 vale exactamente 4.
+      <br><span class="note">Alice y Bob colorean por turnos (empieza Alice) vértices de la rejilla sin repetir color entre vecinos. Alice gana si todo queda coloreado; Bob gana si algún vértice se queda sin color posible.</span></div>
+  </header>
+
+  <nav class="tabs" aria-label="Partes">
+    <a href="#juego">1 · Partida libre</a>
+    <a href="#cota">2 · Con 3 colores gana Bob</a>
+    <a href="#espejo">3 · Estrategia espejo</a>
+    <a href="#laboratorio">4 · Seguros, sanos y bloques</a>
+    <a href="#configuraciones">5 · Configuraciones</a>
+  </nav>
+
+  <section class="view" id="v-juego">
+    <div class="two">
+      <div class="sheet">
+        <div class="controls">
+          <label for="g-role">Tú juegas como <select id="g-role"><option value="B">Bob (contra Alice IA)</option><option value="A">Alice (contra Bob IA)</option><option value="H">los dos (manual)</option></select></label>
+          <label for="g-k">Colores <select id="g-k"><option>3</option><option selected>4</option><option>5</option></select></label>
+          <label for="g-n">Columnas <input id="g-n" type="range" min="4" max="20" value="10"> <span id="g-nv" class="mono">10</span></label>
+          <label for="g-level">Rival <select id="g-level"><option value="dificil" selected>difícil</option><option value="facil">fácil</option></select></label>
+          <label for="g-hints"><input id="g-hints" type="checkbox" checked> Pistas</label>
+          <button id="g-new" class="primary">Nueva partida</button>
+          <button id="g-undo">Deshacer</button>
+          <button id="g-hint">¿Qué juego?</button>
+        </div>
+        <div class="palette" id="g-pal" role="group" aria-label="Color"></div>
+        <div class="scroll"><div id="g-board"></div></div>
+        <div class="status" id="g-status" aria-live="polite"></div>
+        <div class="legend">
+          <span><i class="sw" style="box-shadow: inset 0 0 0 3px color-mix(in srgb, var(--safe) 55%, transparent)"></i>seguro</span>
+          <span><i class="sw" style="background: color-mix(in srgb, var(--sound) 22%, var(--paper))"></i>sano (tiene médicos)</span>
+          <span><i class="sw" style="background: var(--dangerbg)"></i>en peligro</span>
+          <span><i class="sw" style="background: var(--danger)"></i>sin color posible</span>
+          <span>puntos = colores aún disponibles</span>
+        </div>
+      </div>
+      <div class="sheet">
+        <h2>Cómo leerlo</h2>
+        <ul class="plain">
+          <li>Elige un color en la paleta y pulsa una casilla. Solo se aceptan jugadas propias.</li>
+          <li>Los puntos de cada casilla vacía son los colores que todavía puede recibir. Si llegan a cero, gana Bob.</li>
+          <li>Con 5 colores Alice gana siempre: cada vértice tiene como mucho 4 vecinos (Afirmación 1).</li>
+          <li>Con 3 colores y suficientes columnas, Bob puede forzar un bloqueo (Afirmación 2, pestaña 2).</li>
+          <li>Con 4 colores, el artículo da una estrategia ganadora para Alice. La IA de esta página no es esa estrategia: en nivel difícil combina una heurística con una búsqueda de amenazas forzadas y, al final de la partida, un análisis exacto. En nivel fácil solo mira una jugada.</li>
+          <li>Con 4 colores las pistas también marcan los <b>bloques</b> (borde grueso), el estado de cada vértice y la configuración de cada borde (α, β, γ, δ, π) debajo de la rejilla.</li>
+        </ul>
+        <h3>Jugadas</h3>
+        <div id="g-log" class="note mono" style="max-height: 220px; overflow-y: auto; white-space: pre-line"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="view" id="v-cota" hidden>
+    <div class="two">
+      <div class="sheet">
+        <h2>Afirmación 2: con 3 colores, Bob gana (n ≥ 18)</h2>
+        <div class="scroll"><div id="c-board"></div></div>
+        <div class="steps">
+          <button id="c-prev">← Anterior</button>
+          <button id="c-next" class="primary">Siguiente →</button>
+          <button id="c-alt" hidden>¿Y si Alice no lo hace?</button>
+          <span class="counter" id="c-count"></span>
+        </div>
+      </div>
+      <div class="sheet steptext" id="c-text" aria-live="polite"></div>
+    </div>
+  </section>
+
+  <section class="view" id="v-espejo" hidden>
+    <div class="two">
+      <div class="sheet">
+        <h2>Lema 1: si empieza Bob, Alice copia a distancia 2</h2>
+        <p class="note">Tú eres Bob y empiezas. Cada vez que coloreas <span class="mono">v<sub>a,j</sub></span> con el color <i>c</i>, Alice colorea <span class="mono">v<sub>b,j</sub></span> con |a − b| = 2 y el mismo color. Intenta bloquear un vértice con 4 colores: no podrás.</p>
+        <div class="palette" id="m-pal" role="group" aria-label="Color"></div>
+        <div class="scroll"><div id="m-board"></div></div>
+        <div class="controls"><button id="m-new">Reiniciar</button><span class="status" id="m-status" aria-live="polite"></span></div>
+      </div>
+      <div class="sheet">
+        <h2>Por qué funciona</h2>
+        <p>Las filas se emparejan: 1 con 3 y 2 con 4. Tras cada respuesta de Alice, los dos vértices de una pareja tienen el mismo color o están los dos vacíos. Así, cuando se colorea un vértice, sus dos vecinos de la misma columna o están vacíos o tienen el mismo color, y en el peor caso ve 3 colores distintos. Con 4 siempre queda uno.</p>
+        <h2>Por qué falla si empieza Alice</h2>
+        <div class="scroll"><div id="f-board"></div></div>
+        <div class="steps"><button id="f-prev">← Anterior</button><button id="f-next" class="primary">Siguiente →</button><span class="counter" id="f-count"></span></div>
+        <div id="f-text" class="steptext" aria-live="polite"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="view" id="v-laboratorio" hidden>
+    <div class="two">
+      <div class="sheet">
+        <h2>Laboratorio: pinta una coloración parcial</h2>
+        <p class="note">Aquí no hay turnos. Pinta con 4 colores y mira cómo se clasifica cada vértice según las definiciones del artículo. Para pintar, desactiva «Inspeccionar»; la goma o volver a pulsar con el mismo color borra.</p>
+        <div class="controls">
+          <button id="l-fig2">Cargar Fig. 2</button>
+          <button id="l-rand">Coloración aleatoria</button>
+          <button id="l-clear">Vaciar</button>
+          <label for="l-n">Columnas <input id="l-n" type="range" min="4" max="16" value="9"> <span id="l-nv" class="mono">9</span></label>
+        </div>
+        <div class="palette" id="l-pal" role="group" aria-label="Color"></div>
+        <div class="scroll"><div id="l-board"></div></div>
+        <div class="legend">
+          <span><i class="sw" style="box-shadow: inset 0 0 0 3px color-mix(in srgb, var(--safe) 55%, transparent)"></i>seguro</span>
+          <span><i class="sw" style="background: color-mix(in srgb, var(--sound) 22%, var(--paper))"></i>sano</span>
+          <span><i class="sw" style="background: var(--dangerbg)"></i>ni seguro ni sano</span>
+          <span><i class="sw" style="outline: 2px dashed var(--sound); outline-offset: -3px"></i>médico / paciente del vértice elegido</span>
+          <span>borde grueso = bloque · α β γ δ π = configuración del borde</span>
+        </div>
+      </div>
+      <div class="sheet insp">
+        <h2>Inspector</h2>
+        <label for="l-insp" class="note"><input id="l-insp" type="checkbox" checked> Inspeccionar al tocar (no pinta)</label>
+        <p class="note" id="l-hint">Toca una casilla para ver por qué tiene ese estado.</p>
+        <div id="l-detail"></div>
+        <h3>Definiciones</h3>
+        <ul class="plain note">
+          <li><b>Bloque</b>: tramo maximal de columnas consecutivas con algún vértice coloreado en cada una.</li>
+          <li><b>Seguro</b>: (a) coloreado, (b) grado ≤ 3, (c) dos vecinos con el mismo color, o (d) tres vecinos con colores distintos y el cuarto vacío pero junto a un vértice del cuarto color.</li>
+          <li><b>Sano</b>: inseguro, con dos vecinos seguros vacíos (sus <i>médicos</i>); cada médico atiende a un solo paciente. Si Bob colorea un médico, Alice colorea al paciente.</li>
+          <li><b>Enfermo</b>: los vértices rojos de las configuraciones Δ y Λ; no son seguros ni sanos, pero tienen dos vecinos vacíos y siempre conservan un color.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="view" id="v-configuraciones" hidden>
+    <div class="sheet">
+      <h2>Configuraciones de borde y configuraciones particulares</h2>
+      <p>La estrategia de Alice mantiene un invariante: tras cada jugada suya, todo borde de bloque está en α, β, γ, δ o π, y todo vértice de un bloque es seguro, sano o enfermo. Las configuraciones Δ y Λ son las excepciones que contienen vértices enfermos (en rojo). Gris claro = casilla sin restricción; <i>c</i>, <i>c′</i>, <i>c″</i> son colores distintos. Se dibujan con borde derecho en la columna <i>j</i>, salvo Λ (borde izquierdo).</p>
+    </div>
+    <div class="gallery" id="cfg-gallery"></div>
+  </section>
+</div>
+
+<script id="engine">// Game engine: rules, the paper's vertex statuses, and the computer players.
+// A board `g` is { m, n, k, nb, deg }; a position `s` is a Uint8Array (0 = uncolored).
+// Cell id = r*n + c, with r = 0 for row 1 (bottom) and c = 0 for column 1.
+const Engine = (() => {
+  function board(n, k, m = 4) {
+    const nb = [];
+    for (let r = 0; r < m; r++) for (let c = 0; c < n; c++) {
+      const l = [];
+      if (r > 0) l.push((r - 1) * n + c);
+      if (r < m - 1) l.push((r + 1) * n + c);
+      if (c > 0) l.push(r * n + c - 1);
+      if (c < n - 1) l.push(r * n + c + 1);
+      nb.push(l);
+    }
+    return { m, n, k, nb, cells: m * n, full: (1 << k) - 1 };
+  }
+  const bits = x => { let t = 0; while (x) { x &= x - 1; t++; } return t; };
+  function seen(g, s, v) {
+    let mask = 0;
+    for (const w of g.nb[v]) if (s[w]) mask |= 1 << (s[w] - 1);
+    return mask;
+  }
+  const legal = (g, s, v, c) => !s[v] && !(seen(g, s, v) & (1 << (c - 1)));
+  const isDead = (g, s, v) => !s[v] && seen(g, s, v) === g.full;
+  function deadCells(g, s) {
+    const out = [];
+    for (let v = 0; v < g.cells; v++) if (isDead(g, s, v)) out.push(v);
+    return out;
+  }
+  const freeCount = s => { let t = 0; for (let i = 0; i < s.length; i++) if (!s[i]) t++; return t; };
+
+  // Can the free neighbors of v still produce every color v is missing?
+  // When they cannot, v keeps a color forever: this covers conditions (b), (c), (d) of "safe".
+  function canCover(g, s, v) {
+    const missing = g.full & ~seen(g, s, v);
+    const free = g.nb[v].filter(w => !s[w]);
+    if (bits(missing) > free.length) return false;
+    const opts = free.map(w => g.full & ~seen(g, s, w));
+    const go = (i, left) => {
+      if (!left) return true;
+      if (i === opts.length) return false;
+      for (let b = 1; b <= g.full; b <<= 1) if ((left & b) && (opts[i] & b) && go(i + 1, left & ~b)) return true;
+      return go(i + 1, left);
+    };
+    return go(0, missing);
+  }
+
+  // Moves that kill a vertex right now: [cell, color, victim].
+  function killers(g, s) {
+    const out = [];
+    for (let v = 0; v < g.cells; v++) {
+      if (s[v]) continue;
+      const missing = g.full & ~seen(g, s, v);
+      if (bits(missing) !== 1) continue;
+      const c = 31 - Math.clz32(missing) + 1;
+      for (const w of g.nb[v]) if (!s[w] && legal(g, s, w, c)) out.push([w, c, v]);
+    }
+    return out;
+  }
+
+  const emptyCol = (g, s, c) => { for (let r = 0; r < g.m; r++) if (s[r * g.n + c]) return false; return true; };
+
+  // Statuses from the paper: safe, sound (two free safe doctors, one patient per doctor),
+  // uncovered (the paper's sick vertices and worse), threat (killable next move), dead.
+  function statuses(g, s) {
+    const st = new Array(g.cells).fill('');
+    const inBlock = c => !emptyCol(g, s, c);
+    const patients = [];
+    for (let v = 0; v < g.cells; v++) {
+      if (s[v]) { st[v] = 'colored'; continue; }
+      const c = v % g.n;
+      if (isDead(g, s, v)) { st[v] = 'dead'; continue; }
+      if (!canCover(g, s, v)) { st[v] = 'safe'; continue; }
+      if (!inBlock(c)) { st[v] = 'open'; continue; }
+      patients.push(v);
+    }
+    const doctorOf = {};
+    const assign = {};
+    const kill = new Set(killers(g, s).map(x => x[2]));
+    const order = patients.slice().sort((a, b) => cand(a).length - cand(b).length);
+    function cand(v) { return g.nb[v].filter(w => !s[w] && st[w] === 'safe'); }
+    const solve = i => {
+      if (i === order.length) return true;
+      const v = order[i], cs = cand(v).filter(w => !(w in doctorOf));
+      for (let a = 0; a < cs.length; a++) for (let b = a + 1; b < cs.length; b++) {
+        doctorOf[cs[a]] = v; doctorOf[cs[b]] = v; assign[v] = [cs[a], cs[b]];
+        if (solve(i + 1)) return true;
+        delete doctorOf[cs[a]]; delete doctorOf[cs[b]]; delete assign[v];
+      }
+      return false;
+    };
+    // Try to cover everyone; otherwise greedily cover as many patients as possible.
+    if (!solve(0)) for (const v of order) {
+      const cs = cand(v).filter(w => !(w in doctorOf));
+      if (cs.length >= 2) { doctorOf[cs[0]] = v; doctorOf[cs[1]] = v; assign[v] = [cs[0], cs[1]]; }
+    }
+    for (const v of patients) st[v] = kill.has(v) ? 'threat' : assign[v] ? 'sound' : 'uncovered';
+    return { st, doctors: assign };
+  }
+
+  // Border configurations for the column c, read as a right (dir=-1) or left (dir=1) border.
+  function borderConfig(g, s, c, dir) {
+    if (g.m !== 4) return null;
+    const at = (row, col) => (col < 0 || col >= g.n) ? 0 : s[(row - 1) * g.n + col];
+    const inner = c + dir;     // column inside the block
+    const outer = c - dir;     // first column outside the block
+    const outer2 = c - 2 * dir;
+    for (const flip of [false, true]) {
+      const R = row => flip ? 5 - row : row;
+      const v = (row, col) => at(R(row), col);
+      const a1 = v(1, c), a2 = v(2, c), a3 = v(3, c), a4 = v(4, c);
+      if (v(2, inner) && v(2, inner) === a3 && !a2) return 'β';
+      if (a1 && a1 === a4 && a1 === v(3, inner) && !a2 && !a3 && !v(2, inner)) return 'γ';
+      if (a4 && v(3, inner) === a4 && a2 && a2 !== a4) return 'δ';
+      if (a1 && a1 === a4 && a3 && a2 && a3 !== a1 && a2 !== a1 && a2 !== a3 && v(2, outer2) === a3) return 'π';
+    }
+    if (at(1, c) && at(1, c) === at(3, c)) return 'α';
+    if (at(2, c) && at(2, c) === at(4, c)) return 'α';
+    return null;
+  }
+
+  // Blocks: maximal runs of non-empty columns, each with its border labels.
+  function blocks(g, s) {
+    const out = [];
+    let c = 0;
+    while (c < g.n) {
+      if (emptyCol(g, s, c)) { c++; continue; }
+      let e = c;
+      while (e + 1 < g.n && !emptyCol(g, s, e + 1)) e++;
+      out.push({ from: c, to: e, left: borderConfig(g, s, c, 1), right: e > c ? borderConfig(g, s, e, -1) : null });
+      c = e + 1;
+    }
+    return out;
+  }
+
+  function moves(g, s) {
+    let used = 0;
+    for (let i = 0; i < s.length; i++) if (s[i]) used |= 1 << (s[i] - 1);
+    let fresh = 0;
+    for (let c = 1; c <= g.k; c++) if (!(used & (1 << (c - 1)))) { fresh = c; break; }
+    const out = [];
+    for (let v = 0; v < g.cells; v++) {
+      if (s[v]) continue;
+      const se = seen(g, s, v);
+      for (let c = 1; c <= g.k; c++) {
+        const b = 1 << (c - 1);
+        if (se & b) continue;
+        if (!(used & b) && c !== fresh) continue;
+        out.push([v, c]);
+      }
+    }
+    return out;
+  }
+
+  // Position score for Alice: higher is better.
+  function evaluate(g, s) {
+    const { st } = statuses(g, s);
+    let t = 0;
+    for (const x of st) {
+      if (x === 'dead') t -= 1000;
+      else if (x === 'threat') t -= 40;
+      else if (x === 'uncovered') t -= 9;
+      else if (x === 'sound') t -= 2;
+    }
+    return t;
+  }
+
+  // Forced-win search for Bob: he only plays moves that create a threat.
+  function bobMate(g, s, depth, budget) {
+    if (budget.n-- < 0) return null;
+    const kills = killers(g, s);
+    if (kills.length) return [kills[0][0], kills[0][1]];
+    if (depth <= 1) return null;
+    const forcing = [];
+    for (const [v, c] of moves(g, s)) {
+      s[v] = c;
+      if (deadCells(g, s).length) { s[v] = 0; return [v, c]; }
+      const t = killers(g, s);
+      s[v] = 0;
+      if (t.length) forcing.push([t.length, v, c]);
+    }
+    forcing.sort((a, b) => b[0] - a[0]);
+    for (const [, v, c] of forcing) {
+      s[v] = c;
+      const esc = aliceEscapes(g, s, depth - 1, budget);
+      s[v] = 0;
+      if (!esc) return [v, c];
+      if (budget.n < 0) return null;
+    }
+    return null;
+  }
+
+  function aliceEscapes(g, s, depth, budget) {
+    const kills = killers(g, s);
+    if (!kills.length) return true;
+    for (const [v, c] of defenses(g, s, kills)) {
+      s[v] = c;
+      const lost = deadCells(g, s).length > 0 || bobMate(g, s, depth, budget);
+      s[v] = 0;
+      if (!lost) return true;
+      if (budget.n < 0) return true;
+    }
+    return false;
+  }
+
+  // Replies that can stop every kill: touch the victim, the killer cell, or a neighbor of it.
+  function defenses(g, s, kills) {
+    const cells = new Set();
+    for (const [w, , v] of kills) {
+      cells.add(v); cells.add(w);
+      for (const x of g.nb[w]) cells.add(x);
+    }
+    const out = [];
+    for (const v of cells) {
+      if (s[v]) continue;
+      for (let c = 1; c <= g.k; c++) {
+        if (!legal(g, s, v, c)) continue;
+        s[v] = c;
+        const ok = !deadCells(g, s).length && !killers(g, s).length;
+        s[v] = 0;
+        if (ok) out.push([v, c]);
+      }
+    }
+    return out;
+  }
+
+  // Exact endgame solver. Returns true/false, or null when it runs out of budget.
+  function exact(g, s, aliceTurn, limit) {
+    const memo = new Map();
+    let nodes = 0;
+    const go = (left, alice) => {
+      if (!left) return true;
+      const key = s.join('');
+      if (memo.has(key)) return memo.get(key);
+      if (++nodes > limit) throw 0;
+      let res = !alice;
+      for (const [v, c] of moves(g, s)) {
+        s[v] = c;
+        const r = deadCells(g, s).length ? false : go(left - 1, !alice);
+        s[v] = 0;
+        if (alice && r) { res = true; break; }
+        if (!alice && !r) { res = false; break; }
+      }
+      memo.set(key, res);
+      return res;
+    };
+    try { return go(freeCount(s), aliceTurn); } catch (e) { return null; }
+  }
+
+  function exactMove(g, s, aliceTurn, limit) {
+    if (freeCount(s) > 16) return null;
+    const list = moves(g, s);
+    for (const [v, c] of list) {
+      s[v] = c;
+      const r = deadCells(g, s).length ? false : exact(g, s, !aliceTurn, limit);
+      s[v] = 0;
+      if (r === null) return null;
+      if (r === aliceTurn) return { move: [v, c], win: true };
+    }
+    return { move: list[0] || null, win: false };
+  }
+
+  // Alice mirrors Bob two rows away: the Lemma 1 strategy.
+  function mirror(g, s, last) {
+    if (!last || g.m !== 4) return null;
+    const r = Math.floor(last[0] / g.n), c = last[0] % g.n;
+    const r2 = r >= 2 ? r - 2 : r + 2;
+    const v = r2 * g.n + c;
+    return legal(g, s, v, last[1]) ? [v, last[1]] : null;
+  }
+
+  function noise(rng) { return rng() * 0.5; }
+
+  // Alice's computer player. `aliceStarted` false means Lemma 1 applies while k >= 4.
+  function chooseAlice(g, s, last, opts = {}) {
+    const rng = opts.rng || Math.random;
+    if (opts.mirrorOk && g.k >= 4) { const m = mirror(g, s, last); if (m) return m; }
+    const ex = exactMove(g, s, true, opts.exactLimit || 60000);
+    if (ex && ex.move && ex.win) return ex.move;
+    const kills = killers(g, s);
+    let list = kills.length ? defenses(g, s, kills) : moves(g, s);
+    if (!list.length) list = moves(g, s);
+    if (!list.length) return null;
+    const scored = [];
+    for (const [v, c] of list) {
+      s[v] = c;
+      if (!deadCells(g, s).length) {
+        let x = evaluate(g, s) + noise(rng);
+        // Locally the paper's answer in an isolated column: copy Bob at distance 2.
+        const m = mirror(g, s, last);
+        if (last && !m && v % g.n === last[0] % g.n && c === last[1]) x += 3;
+        scored.push([x, v, c]);
+      }
+      s[v] = 0;
+    }
+    if (!scored.length) return list[0];
+    scored.sort((a, b) => b[0] - a[0]);
+    const top = scored.slice(0, opts.width || 10);
+    for (const [, v, c] of top) {
+      s[v] = c;
+      const lost = bobMate(g, s, opts.depth || 3, { n: opts.budget || 1200 });
+      s[v] = 0;
+      if (!lost) return [v, c];
+    }
+    return [top[0][1], top[0][2]];
+  }
+
+  // Bob's computer player: kill, force a win, or pick the quiet move Alice likes least.
+  function chooseBob(g, s, opts = {}) {
+    const rng = opts.rng || Math.random;
+    const kills = killers(g, s);
+    if (kills.length) return [kills[0][0], kills[0][1]];
+    const ex = exactMove(g, s, false, opts.exactLimit || 60000);
+    if (ex && ex.move && ex.win) return ex.move;
+    const mate = bobMate(g, s, opts.depth || 4, { n: opts.budget || 2500 });
+    if (mate) return mate;
+    const scored = [];
+    for (const [v, c] of moves(g, s)) {
+      s[v] = c;
+      if (deadCells(g, s).length) { s[v] = 0; return [v, c]; }
+      const r = Math.floor(v / g.n);
+      scored.push([evaluate(g, s) - noise(rng) - (r === 1 || r === 2 ? 1 : 0), v, c]);
+      s[v] = 0;
+    }
+    if (!scored.length) return null;
+    scored.sort((a, b) => a[0] - b[0]);
+    return [scored[0][1], scored[0][2]];
+  }
+
+  return { board, seen, legal, isDead, deadCells, freeCount, killers, statuses, blocks, borderConfig,
+    moves, evaluate, bobMate, exact, exactMove, mirror, chooseAlice, chooseBob, emptyCol };
+})();
+
+</script>
+<script>
+(() => {
+'use strict';
+const COLORS = ['', 'var(--c1)', 'var(--c2)', 'var(--c3)', 'var(--c4)', 'var(--c5)'];
+const $ = (s) => document.querySelector(s);
+const el = (tag, cls, txt) => { const e = document.createElement(tag); if (cls) e.className = cls; if (txt != null) e.textContent = txt; return e; };
+
+// ---------- motor ----------
+function mk(n, k) { return { n, k, g: [0, 1, 2, 3].map(() => Array(n).fill(0)), last: null }; }
+function nb(S, r, c) { const o = []; if (r > 0) o.push([r - 1, c]); if (r < 3) o.push([r + 1, c]); if (c > 0) o.push([r, c - 1]); if (c < S.n - 1) o.push([r, c + 1]); return o; }
+function avail(S, r, c) { const u = new Set(nb(S, r, c).map(([a, b]) => S.g[a][b])); const o = []; for (let x = 1; x <= S.k; x++) if (!u.has(x)) o.push(x); return o; }
+function legal(S, r, c, x) { return !S.g[r][c] && nb(S, r, c).every(([a, b]) => S.g[a][b] !== x); }
+function deadCells(S) { const d = []; for (let r = 0; r < 4; r++) for (let c = 0; c < S.n; c++) if (!S.g[r][c] && avail(S, r, c).length === 0) d.push([r, c]); return d; }
+function full(S) { return S.g.every(row => row.every(v => v)); }
+function killsAround(S, r, c) { return nb(S, r, c).some(([a, b]) => !S.g[a][b] && avail(S, a, b).length === 0); }
+function moves(S) { const m = []; for (let r = 0; r < 4; r++) for (let c = 0; c < S.n; c++) if (!S.g[r][c]) for (let x = 1; x <= S.k; x++) if (legal(S, r, c, x)) m.push([r, c, x]); return m; }
+function threats(S) { let t = 0; for (const [r, c, x] of moves(S)) { S.g[r][c] = x; if (killsAround(S, r, c)) t++; S.g[r][c] = 0; } return t; }
+function fragile(S) { let f = 0; for (let r = 0; r < 4; r++) for (let c = 0; c < S.n; c++) if (!S.g[r][c]) { const a = avail(S, r, c).length; if (a <= 1) f += 3; else if (a === 2) f += 1; } return f; }
+function pick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+function aliceAI(S) {
+  let best = [], bs = Infinity;
+  for (const [r, c, x] of moves(S)) {
+    S.g[r][c] = x;
+    const s = killsAround(S, r, c) ? 1e9 : threats(S) * 20 + fragile(S);
+    S.g[r][c] = 0;
+    if (s < bs) { bs = s; best = [[r, c, x]]; } else if (s === bs) best.push([r, c, x]);
+  }
+  return best.length ? pick(best) : null;
+}
+function bobAI(S) {
+  const ms = moves(S); const kill = [];
+  for (const [r, c, x] of ms) { S.g[r][c] = x; if (killsAround(S, r, c)) kill.push([r, c, x]); S.g[r][c] = 0; }
+  if (kill.length) return pick(kill);
+  let best = [], bs = -1;
+  for (const [r, c, x] of ms) { S.g[r][c] = x; const s = threats(S) * 3 + fragile(S); S.g[r][c] = 0; if (s > bs) { bs = s; best = [[r, c, x]]; } else if (s === bs) best.push([r, c, x]); }
+  return best.length ? pick(best) : null;
+}
+
+// ---------- análisis (definiciones del artículo, 4 colores) ----------
+function analyze(S) {
+  const { n, g } = S;
+  const empty = []; for (let c = 0; c < n; c++) empty.push(g.every(row => !row[c]));
+  const blocks = []; let c = 0;
+  while (c < n) { if (empty[c]) { c++; continue; } const a = c; while (c < n && !empty[c]) c++; blocks.push([a, c - 1]); }
+  if (n >= 2 && empty[n - 1] && !empty[n - 2] && blocks.length) blocks[blocks.length - 1][1] = n - 1;
+  const blockOf = Array(n).fill(-1); blocks.forEach(([a, b], i) => { for (let x = a; x <= b; x++) blockOf[x] = i; });
+  const safeWhy = (r, col) => {
+    if (g[r][col]) return '(a) ya está coloreado';
+    const N = nb(S, r, col);
+    if (N.length <= 3) return '(b) tiene como mucho 3 vecinos';
+    const cols = N.map(([a, b]) => g[a][b]).filter(v => v);
+    const cnt = {}; for (const v of cols) { cnt[v] = (cnt[v] || 0) + 1; if (cnt[v] >= 2) return '(c) dos vecinos tienen el color ' + v; }
+    if (S.k === 4 && cols.length === 3 && new Set(cols).size === 3) {
+      const fourth = [1, 2, 3, 4].find(x => !cols.includes(x));
+      const u = N.find(([a, b]) => !g[a][b]);
+      if (nb(S, u[0], u[1]).some(([a, b]) => g[a][b] === fourth)) return `(d) ve 3 colores, y su vecino vacío v${u[0] + 1},${u[1] + 1} nunca podrá recibir el ${fourth}`;
+    }
+    return null;
+  };
+  const safe = g.map((row, r) => row.map((_, col) => safeWhy(r, col)));
+  const cfg = {}; const borders = [];
+  blocks.forEach(([a, b]) => { if (a === b) borders.push([a, 'L']); else { borders.push([a, 'L']); borders.push([b, 'R']); } });
+  const at = (j, side, flip, i, o) => { const col = j + (side === 'R' ? o : -o); const r = (flip ? 5 - i : i) - 1; return [r, col]; };
+  for (const [j, side] of borders) {
+    if (j === 0 || j === n - 1) continue;
+    let found = null;
+    for (const name of ['β', 'α', 'γ', 'δ', 'π']) {
+      for (const flip of [false, true]) {
+        const C = (i, o) => { const [r, col] = at(j, side, flip, i, o); return (col < 0 || col >= n) ? 0 : g[r][col]; };
+        let ok = false;
+        if (name === 'α') ok = C(1, 0) && C(1, 0) === C(3, 0) && !(C(2, 0) && C(4, 0) && C(2, 0) === C(4, 0));
+        if (name === 'β') ok = C(2, -1) && C(2, -1) === C(3, 0) && !C(2, 0);
+        if (name === 'γ') { const [r2, c2] = at(j, side, flip, 2, -1); ok = C(1, 0) && C(1, 0) === C(4, 0) && C(4, 0) === C(3, -1) && !C(2, -1) && !C(2, 0) && !C(3, 0) && c2 >= 0 && c2 < n && !!safe[r2][c2]; }
+        if (name === 'δ') ok = C(3, -1) && C(3, -1) === C(4, 0) && C(2, 0) && C(2, 0) !== C(4, 0);
+        if (name === 'π') { const x = C(1, 0), y = C(3, 0), z = C(2, 0); ok = x && x === C(4, 0) && y && y === C(2, 2) && z && new Set([x, y, z]).size === 3; }
+        if (ok) { found = name; break; }
+      }
+      if (found) break;
+    }
+    cfg[j] = { side, name: found };
+  }
+  const alphaCols = new Set(Object.entries(cfg).filter(([, v]) => v.name === 'α').map(([k]) => +k));
+  const status = g.map(row => row.map(() => ''));
+  const doctorsOf = {}; const patientOf = {};
+  const key = (r, col) => r + ',' + col;
+  const patients = [];
+  for (let r = 0; r < 4; r++) for (let col = 0; col < n; col++) {
+    if (g[r][col]) { status[r][col] = 'colored'; continue; }
+    if (safe[r][col]) { status[r][col] = 'safe'; continue; }
+    if (blockOf[col] < 0) { status[r][col] = 'out'; continue; }
+    patients.push([r, col]);
+  }
+  const cand = patients.map(([r, col]) => nb(S, r, col).filter(([a, b]) => !g[a][b] && safe[a][b] && blockOf[b] === blockOf[col] && !alphaCols.has(b)).map(([a, b]) => key(a, b)));
+  const owner = new Map();
+  const tryAug = (slot, seen) => { for (const d of cand[slot >> 1]) { if (seen.has(d)) continue; seen.add(d); if (!owner.has(d) || tryAug(owner.get(d), seen)) { owner.set(d, slot); return true; } } return false; };
+  for (let p = 0; p < patients.length; p++) for (const s of [0, 1]) tryAug(2 * p + s, new Set());
+  const got = patients.map(() => []);
+  for (const [d, slot] of owner) got[slot >> 1].push(d);
+  patients.forEach(([r, col], p) => {
+    if (got[p].length === 2) { status[r][col] = 'sound'; doctorsOf[key(r, col)] = got[p]; got[p].forEach(d => { patientOf[d] = key(r, col); }); }
+    else status[r][col] = 'danger';
+  });
+  return { blocks, blockOf, safe, status, cfg, doctorsOf, patientOf };
+}
+
+// ---------- dibujo ----------
+function drawBoard(host, S, o = {}) {
+  host.innerHTML = '';
+  const A = o.analysis ? analyze(S) : null;
+  const b = el('div', 'board');
+  b.style.gridTemplateColumns = `26px repeat(${S.n}, var(--cell))`;
+  b.appendChild(el('div', 'lab'));
+  for (let c = 0; c < S.n; c++) b.appendChild(el('div', 'lab', o.colLabels ? o.colLabels[c] : String(c + 1)));
+  const dead = new Set(deadCells(S).map(([r, c]) => r + ',' + c));
+  const hl = new Set((o.hl || []).map(([r, c]) => r + ',' + c));
+  const docs = new Set(o.docs || []);
+  for (let r = 3; r >= 0; r--) {
+    b.appendChild(el('div', 'lab rlab', String(r + 1)));
+    for (let c = 0; c < S.n; c++) {
+      const v = S.g[r][c];
+      const cell = el('button', 'cell k' + (v ? 1 : 0));
+      cell.type = 'button';
+      cell.setAttribute('aria-label', `v${r + 1},${c + 1}` + (v ? ` color ${v}` : ' vacío'));
+      if (v) { cell.style.background = COLORS[v]; cell.textContent = v; }
+      else if (o.zeros) cell.textContent = '0';
+      if (!o.onClick) cell.classList.add('ro');
+      const kk = r + ',' + c;
+      if (dead.has(kk) && !o.noDead) cell.classList.add('dead');
+      if (A && !v) cell.classList.add('st-' + A.status[r][c]);
+      if (hl.has(kk)) cell.classList.add('hl');
+      if (docs.has(kk)) cell.classList.add('doc');
+      if (o.sel === kk) cell.classList.add('sel');
+      if (S.last && S.last[0] === r && S.last[1] === c) cell.classList.add('last');
+      if (o.hints && !v) {
+        const d = el('span', 'dots');
+        for (const x of avail(S, r, c)) { const i = el('i'); i.style.background = COLORS[x]; d.appendChild(i); }
+        cell.appendChild(d);
+      }
+      if (A && A.blockOf[c] >= 0) {
+        const sh = []; const [a, bb] = A.blocks[A.blockOf[c]];
+        if (r === 3) sh.push('inset 0 3px 0 var(--ink)');
+        if (r === 0) sh.push('inset 0 -3px 0 var(--ink)');
+        if (c === a) sh.push('inset 3px 0 0 var(--ink)');
+        if (c === bb) sh.push('inset -3px 0 0 var(--ink)');
+        if (!v && A.status[r][c] === 'safe') sh.push('inset 0 0 0 3px color-mix(in srgb, var(--safe) 55%, transparent)');
+        if (sh.length) cell.style.boxShadow = sh.join(',');
+      }
+      if (o.onClick) cell.addEventListener('click', (e) => o.onClick(r, c, e));
+      b.appendChild(cell);
+    }
+  }
+  if (A) {
+    b.appendChild(el('div', 'lab'));
+    for (let c = 0; c < S.n; c++) { const info = A.cfg[c]; b.appendChild(el('div', 'cfglab', info ? (info.name || '·') : '')); }
+  }
+  host.appendChild(b);
+  return A;
+}
+function palette(host, k, state, withErase) {
+  host.innerHTML = '';
+  const btns = [];
+  const add = (x) => {
+    const bt = el('button', 'swatch' + (x === 0 ? ' erase' : ''), x === 0 ? '⌫' : String(x));
+    bt.type = 'button';
+    bt.setAttribute('aria-label', x === 0 ? 'Borrar' : 'Color ' + x);
+    if (x) bt.style.background = COLORS[x];
+    bt.setAttribute('aria-pressed', String(state.color === x));
+    bt.addEventListener('click', () => { state.color = x; btns.forEach(([b2, y]) => b2.setAttribute('aria-pressed', String(y === x))); });
+    btns.push([bt, x]); host.appendChild(bt);
+  };
+  for (let x = 1; x <= k; x++) add(x);
+  if (withErase) add(0);
+}
+
+// ---------- IA difícil en un worker ----------
+let worker = null;
+try {
+  const src = document.getElementById('engine').textContent + `
+    onmessage = e => {
+      const { id, op, n, k, s, last } = e.data;
+      const g = Engine.board(n, k), st = Uint8Array.from(s);
+      postMessage({ id, out: op === 'alice' ? Engine.chooseAlice(g, st, last, {}) : Engine.chooseBob(g, st) });
+    };`;
+  worker = new Worker(URL.createObjectURL(new Blob([src], { type: 'text/javascript' })));
+} catch (e) { worker = null; }
+let reqId = 0; const pending = {};
+if (worker) worker.onmessage = e => { const f = pending[e.data.id]; delete pending[e.data.id]; if (f) f(e.data.out); };
+const flat = S => { const s = []; for (let r = 0; r < 4; r++) for (let c = 0; c < S.n; c++) s.push(S.g[r][c]); return s; };
+function smartMove(S, who) {
+  const msg = { op: who === 'A' ? 'alice' : 'bob', n: S.n, k: S.k, s: flat(S), last: S.last ? [S.last[0] * S.n + S.last[1], S.g[S.last[0]][S.last[1]]] : null };
+  return new Promise(res => {
+    const done = mv => res(mv ? [Math.floor(mv[0] / S.n), mv[0] % S.n, mv[1]] : null);
+    if (worker) { const id = ++reqId; pending[id] = done; worker.postMessage({ ...msg, id }); return; }
+    setTimeout(() => { const g = Engine.board(S.n, S.k), st = Uint8Array.from(msg.s); done(who === 'A' ? Engine.chooseAlice(g, st, msg.last, {}) : Engine.chooseBob(g, st)); }, 30);
+  });
+}
+
+function renderRetos() {}
+function retoEnd() { return ""; }
+// ---------- 1. juego ----------
+const G = { S: null, turn: 'A', role: 'B', over: false, color: 1, log: [], hist: [], epoch: 0, thinking: false, hint: null, reto: null, nextReto: null };
+function gNew() {
+  const n = +$('#g-n').value, k = +$('#g-k').value;
+  G.S = mk(n, k); G.turn = 'A'; G.role = $('#g-role').value; G.over = false; G.log = []; G.hist = []; G.epoch++; G.thinking = false; G.hint = null;
+  G.reto = G.nextReto; G.nextReto = null;
+  if (G.color > k) G.color = 1;
+  palette($('#g-pal'), k, G, false);
+  gRender();
+  if (G.role === 'B') setTimeout(gAI, 350);
+  renderRetos();
+}
+function gStatus() {
+  const s = $('#g-status'); s.className = 'status';
+  const d = deadCells(G.S);
+  if (d.length) { G.over = true; s.classList.add(G.role === 'B' ? 'win' : 'lose'); s.textContent = `Gana Bob: v${d[0][0] + 1},${d[0][1] + 1} ya no puede recibir ningún color.` + retoEnd('B'); return; }
+  if (full(G.S)) { G.over = true; s.classList.add(G.role === 'B' ? 'lose' : 'win'); s.textContent = 'Gana Alice: toda la rejilla está coloreada.' + retoEnd('A'); return; }
+  const who = G.turn === 'A' ? 'Alice' : 'Bob';
+  const mine = G.role === 'H' || G.role === G.turn;
+  s.textContent = mine ? `Turno de ${who}: elige color y casilla.` : `Turno de ${who} (IA)`;
+  if (!mine) s.appendChild(el('span', 'thinking', ' pensando…'));
+}
+function retoEnd(winner) {
+  if (!G.reto) return '';
+  const r = RETOS.find(x => x.id === G.reto);
+  const ok = winner === r.win;
+  if (ok && !retosDone[r.id]) { retosDone[r.id] = true; saveRetos(); }
+  setTimeout(renderRetos, 0);
+  return ok ? ' ¡Reto superado!' : ' Reto no superado: pulsa «Jugar» en el reto para repetirlo.';
+}
+function gRender() {
+  const hints = $('#g-hints').checked;
+  drawBoard($('#g-board'), G.S, { hints, analysis: hints && G.S.k === 4, onClick: gClick, hl: G.hint ? [G.hint] : [] });
+  $('#g-undo').disabled = !G.hist.length;
+  $('#g-hint').disabled = G.over || (G.role !== 'H' && G.turn !== G.role);
+  gStatus();
+  $('#g-log').textContent = G.log.join('\n') || 'Todavía no hay jugadas.';
+}
+function gPlay(r, c, x, who) {
+  G.S.g[r][c] = x; G.S.last = [r, c]; G.hint = null;
+  G.hist.push({ r, c, who });
+  G.log.push(`${G.log.length + 1}. ${who === 'A' ? 'Alice' : 'Bob'}: v${r + 1},${c + 1} ← ${x}`);
+  G.turn = who === 'A' ? 'B' : 'A';
+  gRender();
+  if (!G.over && G.role !== 'H' && G.turn !== G.role) setTimeout(gAI, 380);
+}
+function gClick(r, c) {
+  if (G.over) return;
+  if (G.role !== 'H' && G.turn !== G.role) return;
+  if (!legal(G.S, r, c, G.color)) { $('#g-status').textContent = G.S.g[r][c] ? 'Esa casilla ya está coloreada.' : `El color ${G.color} no es válido ahí: un vecino ya lo tiene.`; return; }
+  gPlay(r, c, G.color, G.turn);
+}
+function gAI() {
+  if (G.over || G.thinking) return;
+  const who = G.turn, ep = G.epoch;
+  if ($('#g-level').value === 'facil') {
+    const m = who === 'A' ? aliceAI(G.S) : bobAI(G.S);
+    if (m) gPlay(m[0], m[1], m[2], who);
+    return;
+  }
+  G.thinking = true;
+  smartMove(G.S, who).then(m => {
+    G.thinking = false;
+    if (ep !== G.epoch || G.over || G.turn !== who) return;
+    if (m && legal(G.S, m[0], m[1], m[2])) gPlay(m[0], m[1], m[2], who);
+  });
+}
+function gUndo() {
+  if (!G.hist.length) return;
+  G.epoch++; G.thinking = false;
+  const back = G.role === 'H' ? 1 : (G.hist[G.hist.length - 1].who !== G.role ? 2 : 1);
+  for (let i = 0; i < back && G.hist.length; i++) {
+    const h = G.hist.pop(); G.S.g[h.r][h.c] = 0; G.turn = h.who; G.log.pop();
+  }
+  const prev = G.hist[G.hist.length - 1];
+  G.S.last = prev ? [prev.r, prev.c] : null;
+  G.over = false; G.hint = null;
+  gRender(); renderRetos();
+  if (G.role !== 'H' && G.turn !== G.role) setTimeout(gAI, 380);
+}
+function gHint() {
+  if (G.over) return;
+  const ep = G.epoch, who = G.turn;
+  $('#g-status').textContent = 'Buscando una buena jugada…';
+  smartMove(G.S, who).then(m => {
+    if (ep !== G.epoch || G.turn !== who || !m) return;
+    G.hint = [m[0], m[1]]; G.color = m[2];
+    palette($('#g-pal'), G.S.k, G, false);
+    gRender();
+    $('#g-status').textContent = `Sugerencia: v${m[0] + 1},${m[1] + 1} con el color ${m[2]} (marcada en azul).`;
+  });
+}
+$('#g-undo').addEventListener('click', gUndo);
+$('#g-hint').addEventListener('click', gHint);
+$('#g-new').addEventListener('click', gNew);
+['#g-role', '#g-k'].forEach(s => $(s).addEventListener('change', gNew));
+$('#g-level').addEventListener('change', () => { if (!G.over && G.role !== 'H' && G.turn !== G.role) gAI(); });
+$('#g-n').addEventListener('input', () => { $('#g-nv').textContent = $('#g-n').value; });
+$('#g-n').addEventListener('change', gNew);
+$('#g-hints').addEventListener('change', gRender);
+
+// ---------- guiones paso a paso ----------
+function runScript(cfg) {
+  const st = { i: 0, alt: false };
+  const build = (upto, alt) => {
+    const S = mk(cfg.n, cfg.k);
+    for (let s = 0; s <= upto; s++) for (const [r, c, x] of (cfg.steps[s].set || [])) S.g[r][c] = x;
+    const stp = cfg.steps[upto];
+    if (alt && stp.alt) for (const [r, c, x] of stp.alt.set) S.g[r][c] = x;
+    const lastSet = alt && stp.alt ? stp.alt.set : stp.set;
+    if (lastSet && lastSet.length) S.last = lastSet[lastSet.length - 1].slice(0, 2);
+    return S;
+  };
+  const render = () => {
+    const stp = cfg.steps[st.i];
+    const alt = st.alt && stp.alt;
+    const S = build(st.i, st.alt);
+    drawBoard($(cfg.board), S, { colLabels: cfg.labels, zeros: true, hints: true, hl: alt ? stp.alt.hl : stp.hl, noDead: !(alt ? stp.alt.dead : stp.dead) });
+    $(cfg.text).innerHTML = alt ? stp.alt.text : stp.text;
+    $(cfg.count).textContent = `Paso ${st.i + 1} de ${cfg.steps.length}`;
+    $(cfg.prev).disabled = st.i === 0; $(cfg.next).disabled = st.i === cfg.steps.length - 1;
+    if (cfg.alt) { $(cfg.alt).hidden = !stp.alt; $(cfg.alt).textContent = st.alt ? 'Volver a la línea principal' : (stp.altLabel || '¿Y si Alice no lo hace?'); }
+  };
+  $(cfg.prev).addEventListener('click', () => { st.i--; st.alt = false; render(); });
+  $(cfg.next).addEventListener('click', () => { st.i++; st.alt = false; render(); });
+  if (cfg.alt) $(cfg.alt).addEventListener('click', () => { st.alt = !st.alt; render(); });
+  render();
+}
+const v = (i, jo) => [i - 1, jo + 1];
+runScript({
+  n: 12, k: 3, board: '#c-board', text: '#c-text', count: '#c-count', prev: '#c-prev', next: '#c-next', alt: '#c-alt',
+  labels: ['j−1', 'j', 'j+1', 'j+2', 'j+3', 'j+4', 'j+5', '…', '…', '…', 'j+9', ''],
+  steps: [
+    { text: '<p>Partida con <b>3 colores</b>. En su primer turno, Bob busca una columna <i>j</i> con las columnas j−4 … j+4 todavía vacías. Con n ≥ 18 esa columna existe, porque Alice solo ha jugado una vez.</p><p>Los puntos de cada casilla son los colores que aún puede recibir.</p>' },
+    { set: [[...v(2, 0), 1]], hl: [v(2, 0)], text: '<p>Bob colorea <span class="mono">v<sub>2,j</sub></span> con el color 1.</p>' },
+    { set: [[...v(1, 9), 2]], hl: [v(1, 9)], text: '<p>Sin pérdida de generalidad, Alice no juega en las columnas j+1 … j+4. Aquí juega lejos, y tampoco toca <span class="mono">v<sub>1,j</sub></span> ni <span class="mono">v<sub>3,j</sub></span>.</p>' },
+    { set: [[...v(2, 2), 2]], hl: [v(2, 2)], text: '<p>Bob colorea <span class="mono">v<sub>2,j+2</sub></span> con <i>c</i> = 2. Es la situación de la Fig. 1 del artículo.</p><p><span class="mono">v<sub>2,j+1</sub></span> ya ve los colores 1 y 2: solo le queda el 3.</p>' },
+    { hl: [v(2, 1)], altLabel: '¿Y si Alice juega en otro sitio?', text: '<p>Amenaza: si Alice no colorea ya <span class="mono">v<sub>2,j+1</sub></span>, Bob pinta uno de sus vecinos verticales con el 3 y lo deja sin color.</p><p>Por tanto, Alice está <b>obligada</b> a jugar ahí.</p>',
+      alt: { set: [[...v(3, 1), 3]], hl: [v(3, 1)], dead: true, text: '<p>Si Alice juega en otra parte, Bob colorea <span class="mono">v<sub>3,j+1</sub></span> con el 3. Ahora <span class="mono">v<sub>2,j+1</sub></span> ve 1, 2 y 3: <b>gana Bob</b>.</p>' } },
+    { set: [[...v(2, 1), 3]], hl: [v(2, 1)], text: '<p>Alice colorea <span class="mono">v<sub>2,j+1</sub></span> con <i>c′</i> = 3, el único color posible.</p>' },
+    { set: [[...v(4, 2), 3]], hl: [v(4, 2), v(3, 2)], altLabel: '¿Y si Alice no cubre v3,j+2?', text: '<p>Bob colorea <span class="mono">v<sub>4,j+2</sub></span> con el 3. Ahora <span class="mono">v<sub>3,j+2</sub></span> ve el 3 (arriba) y el 2 (abajo): solo le queda el 1, y Bob amenaza con poner un 1 a su lado.</p>',
+      alt: { set: [[...v(3, 3), 1]], hl: [v(3, 3)], dead: true, text: '<p>Si Alice no colorea <span class="mono">v<sub>3,j+2</sub></span>, Bob pone un 1 en <span class="mono">v<sub>3,j+3</sub></span> y <span class="mono">v<sub>3,j+2</sub></span> se queda sin color: <b>gana Bob</b>.</p>' } },
+    { set: [[...v(3, 2), 1]], hl: [v(3, 2)], text: '<p>Alice se ve obligada a colorear <span class="mono">v<sub>3,j+2</sub></span> con el 1.</p><p>Fíjate en <span class="mono">v<sub>3,j+1</sub></span>: ve el 3 (abajo) y el 1 (derecha). Solo le queda el 2.</p>' },
+    { set: [[...v(4, 1), 2]], hl: [v(4, 1)], dead: true, text: '<p>Bob colorea <span class="mono">v<sub>4,j+1</sub></span> con el 2. Ahora <span class="mono">v<sub>3,j+1</sub></span> ve 1, 2 y 3 y ya no puede colorearse: <b>Bob gana con 3 colores</b>.</p><p>Por eso χ<sub>g</sub>(P<sub>4</sub>□P<sub>n</sub>) ≥ 4. El artículo trata igual el caso en que Alice sí tocó <span class="mono">v<sub>1,j</sub></span> o <span class="mono">v<sub>3,j</sub></span>.</p>' }
+  ]
+});
+
+// ---------- 3. espejo ----------
+const M = { S: null, color: 1, over: false };
+function mNew() { M.S = mk(9, 4); M.over = false; palette($('#m-pal'), 4, M, false); mRender('Empieza Bob (tú).'); }
+function mRender(msg) { drawBoard($('#m-board'), M.S, { hints: true, onClick: mClick }); $('#m-status').textContent = msg; }
+function mClick(r, c) {
+  if (M.over) return;
+  if (!legal(M.S, r, c, M.color)) { mRender(M.S.g[r][c] ? 'Casilla ocupada.' : `El ${M.color} no es válido ahí.`); return; }
+  M.S.g[r][c] = M.color;
+  const r2 = r < 2 ? r + 2 : r - 2;
+  M.S.g[r2][c] = M.color; M.S.last = [r2, c];
+  if (full(M.S)) { M.over = true; mRender('Rejilla completa: gana Alice. La copia nunca falla con 4 colores.'); return; }
+  mRender(`Alice copia en v${r2 + 1},${c + 1} con el color ${M.color}.`);
+}
+$('#m-new').addEventListener('click', mNew);
+const w = (i, c) => [i - 1, c];
+runScript({
+  n: 9, k: 4, board: '#f-board', text: '#f-text', count: '#f-count', prev: '#f-prev', next: '#f-next', labels: ['i', '', '', '', 'j−1', 'j', 'j+1', '', ''],
+  steps: [
+    { set: [[...w(1, 0), 1]], hl: [w(1, 0)], text: '<p>Ahora empieza Alice (columna <i>i</i>) y después intenta copiar a distancia 2. Bob elige una columna <i>j</i> lejos de <i>i</i>.</p>' },
+    { set: [[...w(1, 4), 1], [...w(3, 4), 1]], hl: [w(1, 4), w(3, 4)], text: '<p>Bob: <span class="mono">v<sub>1,j−1</sub></span> ← 1. Alice copia en <span class="mono">v<sub>3,j−1</sub></span>.</p>' },
+    { set: [[...w(2, 6), 1], [...w(4, 6), 1]], hl: [w(2, 6), w(4, 6)], text: '<p>Bob: <span class="mono">v<sub>2,j+1</sub></span> ← 1. Alice copia en <span class="mono">v<sub>4,j+1</sub></span>.</p>' },
+    { set: [[...w(2, 4), 2], [...w(4, 4), 2]], hl: [w(2, 4), w(4, 4)], text: '<p>Bob: <span class="mono">v<sub>2,j−1</sub></span> ← 2. Alice copia en <span class="mono">v<sub>4,j−1</sub></span>.</p>' },
+    { set: [[...w(1, 6), 2], [...w(3, 6), 2]], hl: [w(1, 6), w(3, 6)], text: '<p>Bob: <span class="mono">v<sub>1,j+1</sub></span> ← 2. Alice copia en <span class="mono">v<sub>3,j+1</sub></span>.</p><p>La columna <i>j</i> queda rodeada por 1 y 2 alternados. Como Alice empezó, Bob puede gestionar la paridad para que sea ella quien tenga que estrenar la columna <i>j</i>.</p>' },
+    { set: [[...w(1, 5), 3]], hl: [w(1, 5)], text: '<p>Alice colorea <span class="mono">v<sub>1,j</sub></span> con el 3 (no puede usar ni el 1 ni el 2).</p>' },
+    { set: [[...w(3, 5), 4]], hl: [w(3, 5), w(2, 5)], dead: true, text: '<p>Bob colorea <span class="mono">v<sub>3,j</sub></span>, a distancia 2, con el <b>4</b>. El vecino común <span class="mono">v<sub>2,j</sub></span> ve 2, 1, 3 y 4: necesitaría un quinto color. <b>Gana Bob</b>.</p><p>Por eso el artículo necesita una estrategia mucho más fina (bloques, configuraciones y médicos) cuando empieza Alice.</p>' }
+  ]
+});
+
+// ---------- 4. laboratorio ----------
+const L = { S: null, color: 1, sel: null, docs: [] };
+function lSelect(k) { L.sel = k; if (!k) { L.docs = []; return; } const A = analyze(L.S); L.docs = A.doctorsOf[k] || (A.patientOf[k] ? [A.patientOf[k]] : []); }
+function lRender() { const A = drawBoard($('#l-board'), L.S, { analysis: true, hints: true, onClick: lClick, sel: L.sel, docs: L.docs }); lDetail(A); }
+function lDetail(A) {
+  const d = $('#l-detail');
+  if (!L.sel) { d.innerHTML = '<p class="note">Ningún vértice seleccionado.</p>'; return; }
+  const [r, c] = L.sel.split(',').map(Number);
+  const S = L.S; const val = S.g[r][c]; const st = A.status[r][c];
+  const chips = { colored: ['coloreado', ''], safe: ['seguro', 'safe'], sound: ['sano', 'sound'], danger: ['ni seguro ni sano', 'danger'], out: ['fuera de bloque', ''] };
+  const name = (k) => { const [a, b] = k.split(',').map(Number); return `v${a + 1},${b + 1}`; };
+  const N = nb(S, r, c).map(([a, b]) => `v${a + 1},${b + 1}=${S.g[a][b] || '·'}`).join('  ');
+  let why = '';
+  if (st === 'safe' || st === 'colored') why = A.safe[r][c];
+  else if (st === 'sound') why = 'Médicos: ' + A.doctorsOf[L.sel].map(name).join(' y ') + '. Si Bob colorea uno de ellos, Alice colorea este vértice.';
+  else if (st === 'danger') why = 'Es inseguro y no se le pueden asignar dos médicos libres. ' + (nb(S, r, c).filter(([a, b]) => !S.g[a][b]).length >= 2 ? 'Aun así tiene al menos dos vecinos vacíos, como los vértices enfermos del artículo.' : 'Bob podría bloquearlo pronto.');
+  else if (st === 'out') why = 'No pertenece a ningún bloque: su columna está vacía.';
+  if (A.patientOf[L.sel]) why += ` Es médico de ${name(A.patientOf[L.sel])}.`;
+  const bi = A.blockOf[c]; const cf = A.cfg[c];
+  d.innerHTML = `<dl>
+    <dt>Vértice</dt><dd class="mono">v<sub>${r + 1},${c + 1}</sub> ${val ? '(color ' + val + ')' : '(vacío)'}</dd>
+    <dt>Estado</dt><dd><span class="chip ${chips[st][1]}">${chips[st][0]}</span></dd>
+    <dt>Motivo</dt><dd>${why || '—'}</dd>
+    <dt>Vecinos</dt><dd class="mono">${N}</dd>
+    <dt>Disponibles</dt><dd class="mono">${val ? '—' : (avail(S, r, c).join(', ') || 'ninguno')}</dd>
+    <dt>Bloque</dt><dd>${bi >= 0 ? `columnas ${A.blocks[bi][0] + 1}–${A.blocks[bi][1] + 1}` : 'ninguno'}${cf ? ` · borde ${cf.side === 'R' ? 'derecho' : 'izquierdo'} ${cf.name ? 'en configuración ' + cf.name : 'sin configuración α–π'}` : ''}</dd>
+  </dl>`;
+}
+function lClick(r, c, e) {
+  const inspect = $('#l-insp').checked || (e && e.shiftKey);
+  if (!inspect) {
+    const cur = L.S.g[r][c];
+    if (L.color === 0 || cur === L.color) L.S.g[r][c] = 0;
+    else { L.S.g[r][c] = 0; if (legal(L.S, r, c, L.color)) L.S.g[r][c] = L.color; else L.S.g[r][c] = cur; }
+  }
+  lSelect(r + ',' + c);
+  lRender();
+}
+function loadCols(colsTopDown, n, offset) {
+  const map = { '': 0, '0': 0, '0P': 0, '0s': 0, 's': 0, 'c': 1, "c'": 2, "c''": 3, '1': 1 };
+  const S = mk(n, 4);
+  colsTopDown.forEach((col, ci) => col.forEach((t, k) => { S.g[3 - k][ci + offset] = map[t] ?? 0; }));
+  return S;
+}
+const FIG2 = [['', '', "c'", ''], ['', "c'", '0', 'c'], ['0', 'c', '0P', '0'], ['0', '0P', '0', 'c'], ['', '0', 'c', '']];
+function loadFig2() { $('#l-n').value = 9; $('#l-nv').textContent = 9; L.S = loadCols(FIG2, 9, 2); lSelect('1,4'); lRender(); }
+$('#l-fig2').addEventListener('click', loadFig2);
+$('#l-clear').addEventListener('click', () => { L.S = mk(+$('#l-n').value, 4); lSelect(null); lRender(); });
+$('#l-rand').addEventListener('click', () => {
+  const S = mk(+$('#l-n').value, 4);
+  for (let t = 0; t < S.n * 2; t++) { const ms = moves(S); if (!ms.length) break; const [r, c, x] = pick(ms); S.g[r][c] = x; if (deadCells(S).length) S.g[r][c] = 0; }
+  L.S = S; lSelect(null); lRender();
+});
+$('#l-n').addEventListener('input', () => { $('#l-nv').textContent = $('#l-n').value; });
+$('#l-n').addEventListener('change', () => { L.S = mk(+$('#l-n').value, 4); lSelect(null); lRender(); });
+$('#l-insp').addEventListener('change', () => { $('#l-hint').textContent = $('#l-insp').checked ? 'Toca una casilla para ver por qué tiene ese estado.' : 'Toca para pintar con el color elegido. Con Mayús pulsada inspeccionas sin pintar.'; });
+
+// ---------- 5. galería ----------
+const Z = ['0', '0', '0', '0'], E = ['', '', '', ''];
+const CFGS = [
+  { name: 'α', cols: [E, ['', 'c', '', 'c'], Z], out: [0, 2], thick: [2], j: 1, text: 'Dos vértices del borde a distancia 2 con el mismo color (filas 1 y 3, o 2 y 4). Los otros dos no pueden ser médicos y, si están coloreados, tienen colores distintos.' },
+  { name: 'β', cols: [['', '', 'c', ''], ['', 'c', '0', ''], Z], out: [0, 2], thick: [2], j: 1, text: '<span class="mono">c(v<sub>2,j−1</sub>) = c(v<sub>3,j</sub>)</span> y <span class="mono">v<sub>2,j</sub></span> vacío: ese vértice ya ve dos veces el mismo color, así que es seguro.' },
+  { name: 'γ', cols: [['', 'c', '0s', ''], ['c', '0', '0', 'c'], Z], out: [0, 2], thick: [2], j: 1, text: 'Filas 1 y 4 del borde y <span class="mono">v<sub>3,j−1</sub></span> con el mismo color; <span class="mono">v<sub>2,j</sub></span> es sano, con médicos <span class="mono">v<sub>2,j−1</sub></span> y <span class="mono">v<sub>3,j</sub></span>.' },
+  { name: 'δ', cols: [['', 'c', '', ''], ['c', '0', "c'", ''], Z], out: [0, 2], thick: [2], j: 1, text: '<span class="mono">c(v<sub>3,j−1</sub>) = c(v<sub>4,j</sub>) = c</span> y <span class="mono">v<sub>2,j</sub></span> con otro color <i>c′</i>.' },
+  { name: 'π', cols: [['c', "c'", "c''", 'c'], Z, ['', '', "c'", '']], out: [0, 2], thick: [1, 2], j: 0, text: 'La columna <i>j</i> llena con c, c′, c″, c, y una columna vacía antes de otro bloque cuyo <span class="mono">v<sub>2,j+2</sub></span> tiene <i>c′</i>.' },
+  { name: 'Δ', cols: [['', 'c', '', 'c'], ['0', '0P', "c'", '0'], ['c', '0', 'c', '0'], Z], out: [0, 3], thick: [3], j: 0, text: '<span class="mono">v<sub>3,j+1</sub></span> es enfermo: su posible médico <span class="mono">v<sub>3,j+2</sub></span> está en un borde α y no puede ejercer.' },
+  { name: 'Δ′', cols: [E, ['', 'c', '0s', ''], ['c', '0', '0', 'c'], ['0', 'c', '0', '0'], ['0', '0P', '0', 'c'], ['', '', 'c', '']], out: [0, 5], thick: [], j: 2, text: 'Tres pacientes potenciales y solo tres médicos posibles: <span class="mono">v<sub>3,j+2</sub></span> se queda enfermo.' },
+  { name: 'Δ′₂', cols: [E, ['', 'c', '0s', ''], ['c', '0', '0', 'c'], ['0', 'c', '0P', '0'], ['', '', "c'", 'c']], out: [0, 4], thick: [], j: 2, text: '<span class="mono">v<sub>2,j</sub></span> es sano, pero <span class="mono">v<sub>2,j+1</sub></span> queda enfermo.' },
+  { name: 'Λ', cols: [E, ['c', '0', 'c', '0'], ['0', '0P', '0', '0'], ["c'", 'c', '0', 'c'], ['', '', "c''", '']], out: [0, 4], thick: [1, 3], j: 3, text: 'Una columna vacía entre dos bloques con un único vértice inseguro (<span class="mono">v<sub>3,j−1</sub></span>) que no se puede hacer sano.' },
+  { name: 'Λ′', cols: [E, ['c', '0', 'c', '0'], ['0', '0P', '0', '0'], ["c'", 'c', '0', 'c'], ['c', '0', '0', '0'], ['', 's', '', '']], out: [0, 5], thick: [1, 3], j: 3, text: 'Como Λ, con una columna más; el vértice marcado «seguro» garantiza que <span class="mono">v<sub>2,j+1</sub></span> es sano.' }
+];
+const symColor = { 'c': 1, "c'": 2, "c''": 3 };
+const symTxt = { 'c': 'c', "c'": 'c′', "c''": 'c″' };
+function miniGrid(cfg) {
+  const g = el('div', 'mini');
+  g.style.gridTemplateColumns = `repeat(${cfg.cols.length}, 30px)`;
+  cfg.cols.forEach((_, ci) => g.appendChild(el('div', 'lab', ci === cfg.j ? 'j' : '')));
+  for (let k = 0; k < 4; k++) cfg.cols.forEach((col, ci) => {
+    const t = col[k]; const d = el('div');
+    const sh = [];
+    if (cfg.out.includes(ci)) d.classList.add('out');
+    if (t === '') d.classList.add('unk');
+    else if (t === '0' || t === '0s') { d.classList.add('zero'); d.textContent = '0'; if (t === '0s') { d.title = 'seguro'; sh.push('inset 0 0 0 3px color-mix(in srgb, var(--safe) 55%, transparent)'); } }
+    else if (t === '0P') { d.classList.add('sick'); d.textContent = '0'; }
+    else if (t === 's') { d.classList.add('tiny'); d.textContent = 'seguro'; }
+    else { d.style.background = COLORS[symColor[t]]; d.textContent = symTxt[t]; }
+    if (cfg.thick.includes(ci)) sh.push('inset 3px 0 0 var(--ink)');
+    if (cfg.thick.includes(ci + 1)) sh.push('inset -3px 0 0 var(--ink)');
+    if (sh.length) d.style.boxShadow = sh.join(',');
+    g.appendChild(d);
+  });
+  return g;
+}
+const gal = $('#cfg-gallery');
+for (const cf of CFGS) {
+  const card = el('div', 'gcard');
+  card.appendChild(el('h3', null, 'Configuración ' + cf.name));
+  const sc = el('div', 'scroll'); sc.appendChild(miniGrid(cf)); card.appendChild(sc);
+  const p = el('p', 'note'); p.innerHTML = cf.text; card.appendChild(p);
+  const bt = el('button', null, 'Analizar en el laboratorio');
+  bt.type = 'button';
+  bt.addEventListener('click', () => {
+    const n = Math.max(9, cf.cols.length + 4);
+    $('#l-n').value = n; $('#l-nv').textContent = n;
+    L.S = loadCols(cf.cols, n, 2); lSelect(null);
+    location.hash = '#laboratorio';
+    lRender();
+  });
+  card.appendChild(bt);
+  gal.appendChild(card);
+}
+
+// ---------- pestañas ----------
+const VIEWS = ['juego', 'cota', 'espejo', 'laboratorio', 'configuraciones'];
+function route() {
+  const h = (location.hash || '#juego').slice(1);
+  const cur = VIEWS.includes(h) ? h : 'juego';
+  VIEWS.forEach(x => { $('#v-' + x).hidden = x !== cur; });
+  document.querySelectorAll('nav.tabs a').forEach(a => a.setAttribute('aria-current', a.getAttribute('href') === '#' + cur ? 'page' : 'false'));
+}
+window.addEventListener('hashchange', route);
+route();
+if (window.innerWidth < 560) { $('#g-n').value = 8; $('#g-nv').textContent = 8; }
+gNew(); mNew();
+palette($('#l-pal'), 4, L, true);
+loadFig2();
+})();
+</script>
+<style>
+/* Zócalo. Layout: una pared de azulejos 4×n a lo ancho sobre fondo albero; rival arriba, pared en el centro, bandeja de azulejos junto al pulgar. */
+:root { --z-ground:#e7a838; --z-ink:#14255c; --z-soft:#33385c; --z-wall:#fbfaf5; --z-grout:#d5d2c8; --z-panel:#fbfaf5; --z-ptext:#14255c; --z-psoft:#565d7d;
+  --z-btn:#1f3f9e; --z-btntx:#ffffff; --z-btnedge:#12286d; --z-bad:#b3241f; --z-good:#1f7a4b; --z-star:#c98407;
+  --t1:#2346a8; --t2:#f0b429; --t3:#2e8b57; --t4:#8e2f4a; --t5:#57b7d6;
+  --z-display:'Caprasimo','Cooper Black',Georgia,serif; --z-body:'Figtree','Segoe UI',system-ui,sans-serif; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --z-ground:#0f1838; --z-ink:#f6ead0; --z-soft:#b9bfd8; --z-wall:#e9e6db; --z-grout:#8f90a0; --z-panel:#1b2858; --z-ptext:#f6ead0; --z-psoft:#b4bbd9; --z-btn:#f0b429; --z-btntx:#14255c; --z-btnedge:#a8780f; --z-bad:#ff7a70; --z-good:#6fd49f; --z-star:#f0b429 } }
+:root[data-theme="dark"] { --z-ground:#0f1838; --z-ink:#f6ead0; --z-soft:#b9bfd8; --z-wall:#e9e6db; --z-grout:#8f90a0; --z-panel:#1b2858; --z-ptext:#f6ead0; --z-psoft:#b4bbd9; --z-btn:#f0b429; --z-btntx:#14255c; --z-btnedge:#a8780f; --z-bad:#ff7a70; --z-good:#6fd49f; --z-star:#f0b429 }
+[hidden] { display: none !important; }
+body.z-on { background: var(--z-ground); background-image: none; }
+#z { color: var(--z-ink); font: 16px/1.45 var(--z-body); max-width: 900px; margin: 0 auto; padding-block: 14px 24px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+#z h1, #z h2, #z h3 { font-family: var(--z-display); font-weight: 400; line-height: 1.02; }
+#z h1 { font-size: clamp(58px, 17vw, 112px); }
+#z h2 { font-size: 30px; } #z h3 { font-size: 20px; }
+#z button { font: 700 16px/1.2 var(--z-body); color: inherit; background: none; border: 0; padding: 0; border-radius: 0; cursor: pointer; text-align: inherit; touch-action: manipulation; }
+#z button:disabled { opacity: .4; cursor: default; }
+#z button:focus-visible, #z a:focus-visible { outline: 3px solid var(--z-ink); outline-offset: 2px; }
+#z .z-btn { background: var(--z-btn); color: var(--z-btntx); padding: 13px 20px; border-radius: 10px; box-shadow: 0 4px 0 var(--z-btnedge); text-align: center; }
+#z .z-btn:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--z-btnedge); }
+#z .z-btn.alt { background: transparent; color: var(--z-ptext); box-shadow: inset 0 0 0 2px var(--z-ptext); }
+#z .z-chip { font-weight: 700; font-size: 14px; padding: 9px 12px; border-radius: 8px; box-shadow: inset 0 0 0 2px currentColor; display: inline-flex; align-items: center; min-height: 40px; }
+#z .z-chip.on { background: var(--z-btn); color: var(--z-btntx); }
+.z-row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+.z-between { justify-content: space-between; }
+.z-screen { display: grid; gap: 18px; align-content: start; grid-template-columns: minmax(0, 1fr); }
+.z-note { color: var(--z-soft); font-size: 15px; }
+.z-panel { background: var(--z-panel); color: var(--z-ptext); border-radius: 14px; padding: 18px; display: grid; gap: 12px; min-width: 0; }
+.z-panel .z-note { color: var(--z-psoft); }
+.z-wallbox { position: relative; background: var(--z-grout); padding: 6px; border-radius: 8px; width: fit-content; max-width: 100%; margin: 0 auto; box-shadow: 0 6px 0 color-mix(in srgb, var(--z-ink) 35%, var(--z-ground)); }
+.z-wall { display: grid; gap: 3px; }
+.z-wallbox.shake { animation: z-shake .42s; }
+#z .z-cell { width: var(--cs); height: var(--cs); background: var(--z-wall); border-radius: 4px; position: relative; display: block; }
+#z .z-cell svg { width: 100%; height: 100%; display: block; border-radius: 4px; }
+#z .z-cell.pop svg { animation: z-pop .28s cubic-bezier(.2,1.6,.4,1); }
+#z .z-cell.last { box-shadow: 0 0 0 3px #14255c; z-index: 1; }
+#z .z-cell.warn { background: #f3c4bf; box-shadow: 0 0 0 3px #c4312b; animation: z-warn 1s infinite; z-index: 2; }
+#z .z-cell.sel { box-shadow: 0 0 0 4px #14255c; animation: none; z-index: 3; }
+#z .z-cell.hint { box-shadow: 0 0 0 4px #1f7a4b; animation: none; z-index: 3; }
+#z .z-cell.scr { box-shadow: 0 0 0 4px #c4312b; z-index: 3; }
+#z .z-cell.dead { background: #c4312b; animation: none; }
+#z .z-cell .dots { position: absolute; inset: 20%; display: grid; grid-template-columns: 1fr 1fr; gap: 12%; place-items: center; }
+#z .z-cell .dots i { width: 78%; aspect-ratio: 1; border-radius: 30%; display: block; }
+.z-mini { pointer-events: none; }
+.z-vs { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); gap: 8px; align-items: center; }
+.z-who { display: flex; gap: 8px; align-items: center; min-width: 0; font-weight: 700; }
+.z-who.r { flex-direction: row-reverse; text-align: right; }
+.z-who svg { width: 60px; height: 60px; flex: none; border-radius: 14px; }
+.z-who.turn svg { box-shadow: 0 0 0 4px var(--z-ink); }
+.z-who small { display: block; font-weight: 500; font-size: 13px; color: var(--z-soft); }
+.z-score { font: 400 30px/1 var(--z-display); text-align: center; font-variant-numeric: tabular-nums; }
+.z-cast { display: flex; gap: 10px; } .z-cast svg { width: 64px; height: 64px; border-radius: 14px; }
+.z-say { min-height: 46px; display: grid; place-items: center; text-align: center; font-weight: 600; text-wrap: balance; }
+.z-clock { height: 8px; border-radius: 4px; background: color-mix(in srgb, var(--z-ink) 22%, transparent); overflow: hidden; }
+.z-clock i { display: block; height: 100%; background: var(--z-ink); width: 100%; }
+.z-clock.low i { background: var(--z-bad); }
+.z-tray { display: flex; justify-content: center; gap: 8px; }
+#z .z-t { width: clamp(50px, 15vw, 66px); aspect-ratio: 1; border-radius: 8px; overflow: hidden; background: var(--z-wall); box-shadow: 0 4px 0 color-mix(in srgb, var(--z-ink) 60%, var(--z-ground)); }
+#z .z-t svg { width: 100%; height: 100%; display: block; }
+#z .z-t:active:not(:disabled) { transform: translateY(3px); box-shadow: none; }
+#z .z-t:disabled { opacity: .25; box-shadow: none; }
+.z-pop { position: absolute; left: 50%; top: 42%; font: 400 clamp(24px, 7vw, 44px)/1 var(--z-display); color: #14255c; background: #f0b429; padding: 10px 18px 12px; border-radius: 10px; pointer-events: none; white-space: nowrap; z-index: 8; opacity: 0; animation: z-float 1.2s both; }
+.z-pop.bad { background: #b3241f; color: #fff; }
+.z-bit { position: absolute; width: 10px; height: 10px; pointer-events: none; z-index: 7; }
+.z-over { position: fixed; inset: 0; background: rgba(11, 18, 48, .64); display: grid; place-items: center; z-index: 20; padding: max(16px, env(safe-area-inset-top, 0px)) 16px max(16px, env(safe-area-inset-bottom, 0px)); overflow-y: auto; }
+.z-over .z-panel { width: min(400px, 100%); text-align: center; animation: z-in .3s cubic-bezier(.2,1.3,.4,1); }
+.z-over .z-row { justify-content: center; }
+.z-stars { font-size: 46px; line-height: 1; letter-spacing: 4px; color: var(--z-grout); }
+.z-stars b { color: var(--z-star); font-weight: 400; display: inline-block; animation: z-pop .5s cubic-bezier(.2,1.8,.4,1) both; }
+.z-goals { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; text-align: left; font-size: 15px; }
+.z-goals .y { color: var(--z-good); font-weight: 700; } .z-goals .n { color: var(--z-psoft); }
+.z-modes { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 250px), 1fr)); gap: 12px; }
+#z .z-mode { background: var(--z-panel); color: var(--z-ptext); border-radius: 12px; padding: 16px; display: grid; gap: 4px; font-weight: 500; font-size: 15px; box-shadow: 0 4px 0 color-mix(in srgb, var(--z-ink) 35%, var(--z-ground)); }
+#z .z-mode strong { font: 400 22px/1.1 var(--z-display); }
+#z .z-mode span { color: var(--z-psoft); }
+#z .z-mode:active { transform: translateY(3px); box-shadow: none; }
+.z-levels { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 260px), 1fr)); gap: 10px; }
+#z .z-lv { display: grid; grid-template-columns: 46px minmax(0, 1fr); gap: 2px 12px; align-items: center; align-content: center; background: var(--z-panel); color: var(--z-ptext); border-radius: 12px; padding: 12px; font-weight: 500; font-size: 14px; }
+#z .z-lv > em { grid-row: span 2; font: 400 22px/46px var(--z-display); width: 46px; height: 46px; text-align: center; border-radius: 8px; background: #2346a8; color: #fff; }
+#z .z-lv.bob > em { background: #8e2f4a; }
+#z .z-lv strong { font: 400 18px/1.1 var(--z-display); display: flex; justify-content: space-between; gap: 8px; }
+#z .z-lv strong i { font: 400 15px/1.2 var(--z-body); color: var(--z-star); white-space: nowrap; }
+#z .z-lv span { color: var(--z-psoft); }
+.z-field { display: grid; gap: 8px; }
+@keyframes z-pop { from { transform: scale(.2) rotate(-14deg); } }
+@keyframes z-shake { 20% { transform: translateX(-9px) rotate(-.6deg); } 45% { transform: translateX(8px) rotate(.6deg); } 70% { transform: translateX(-5px); } }
+@keyframes z-warn { 50% { box-shadow: 0 0 0 1px #c4312b; } }
+@keyframes z-float { 0% { transform: translate(-50%,-50%) rotate(-3deg) scale(.4); opacity: 0; } 18% { transform: translate(-50%,-50%) rotate(-3deg) scale(1.1); opacity: 1; } 70% { transform: translate(-50%,-70%) rotate(-3deg); opacity: 1; } 100% { transform: translate(-50%,-120%) rotate(-3deg); opacity: 0; } }
+@keyframes z-in { from { transform: translateY(24px) scale(.94); } }
+@media (prefers-reduced-motion: reduce) { #z *, .z-over .z-panel { animation-duration: .01s !important; animation-iteration-count: 1 !important; } .z-bit { display: none; } .z-pop { animation-duration: 1.2s !important; } }
+</style>
+<main id="z" hidden>
+  <section class="z-screen" data-s="home">
+    <div class="z-row z-between"><b>El juego de coloración 4 × n</b><button class="z-chip z-mutebtn" type="button">Sonido: sí</button></div>
+    <div style="display:grid;gap:8px"><h1>Zócalo</h1><p style="font-size:19px;max-width:34ch">Alice alicata la pared. Bob quiere agrietarla. Dos azulejos iguales nunca se tocan.</p></div>
+    <div class="z-cast" id="z-cast" aria-hidden="true"></div>
+    <div class="z-wallbox z-mini" aria-hidden="true"><div class="z-wall" id="z-demo"></div></div>
+    <button class="z-btn" id="z-play" type="button" style="font-size:21px;padding:17px">Jugar</button>
+    <div class="z-modes">
+      <button class="z-mode" type="button" data-go="map"><strong>Campaña</strong><span id="z-c-sub"></span></button>
+      <button class="z-mode" type="button" data-go="endless"><strong>Obra sin fin</strong><span id="z-e-sub"></span></button>
+      <button class="z-mode" type="button" data-go="puz"><strong>Golpes maestros</strong><span id="z-p-sub"></span></button>
+      <button class="z-mode" type="button" data-go="duel"><strong>Duelo</strong><span>Dos personas, un móvil</span></button>
+    </div>
+    <div class="z-row"><button class="z-chip" type="button" data-go="help">Cómo se juega</button><a class="z-chip" href="#juego" style="color:inherit;text-decoration:none">Modo clase: la demostración</a></div>
+  </section>
+  <section class="z-screen" data-s="map" hidden><div class="z-row z-between"><h2>Campaña</h2><button class="z-chip" type="button" data-go="home">Inicio</button></div><p class="z-note" id="z-map-sub"></p><div class="z-levels" id="z-levels"></div></section>
+  <section class="z-screen" data-s="puz" hidden><div class="z-row z-between"><h2>Golpes maestros</h2><button class="z-chip" type="button" data-go="home">Inicio</button></div><p class="z-note">Eres Bob y la grieta está ahí, pero hay que verla. Cada problema tiene solución forzada: tus amenazas obligan a Alice a responder.</p><div class="z-levels" id="z-puzzles"></div></section>
+  <section class="z-screen" data-s="duel" hidden><div class="z-row z-between"><h2>Duelo</h2><button class="z-chip" type="button" data-go="home">Inicio</button></div>
+    <div class="z-panel"><div class="z-field"><b>Azulejos distintos</b><div class="z-row" id="z-d-k"></div></div><div class="z-field"><b>Columnas</b><div class="z-row" id="z-d-n"></div></div><p class="z-note" id="z-d-note"></p><button class="z-btn" id="z-d-go" type="button">Empezar</button></div></section>
+  <section class="z-screen" data-s="help" hidden><div class="z-row z-between"><h2>Cómo se juega</h2><button class="z-chip" type="button" data-go="home">Inicio</button></div>
+    <div class="z-panel"><h3>Turnos</h3><p>Alice y Bob colocan un azulejo cada uno. Toca un hueco y después el azulejo. No puede ser igual que el de arriba, abajo, izquierda o derecha.</p>
+    <h3>Los puntos</h3><p>Los puntos de un hueco son los azulejos que aún caben. Si un hueco se queda sin puntos, la pared se agrieta y gana Bob. Si se completa, gana Alice.</p>
+    <h3>Peligro</h3><p>Un hueco rojo se puede agrietar en la próxima jugada. Alice debe salvarlo; Bob debe rematarlo.</p>
+    <h3>Herramientas</h3><p><b>Espátula</b> (Alice): quita un azulejo ya puesto sin gastar turno. Si la pared se agrieta, te salva. <b>Doble</b> (Bob): coloca dos azulejos seguidos.</p>
+    <h3>Teclado</h3><p>Flechas para moverte, números del 1 al 5 para colocar.</p></div></section>
+  <section class="z-screen" data-s="play" hidden style="gap:12px">
+    <div class="z-row z-between" style="flex-wrap:nowrap"><button class="z-chip" type="button" id="z-exit">Salir</button><b id="z-title" style="font:400 19px/1.1 var(--z-display);text-align:center;min-width:0"></b><button class="z-chip z-mutebtn" type="button">Sonido: sí</button></div>
+    <div class="z-vs"><div class="z-who" id="z-wa"></div><div class="z-score" id="z-score">0</div><div class="z-who r" id="z-wb"></div></div>
+    <div class="z-clock" id="z-clock" hidden><i></i></div>
+    <div class="z-say" id="z-say" aria-live="polite"></div>
+    <div class="z-wallbox" id="z-box"><div class="z-wall" id="z-wall" role="group" aria-label="Pared"></div></div>
+    <div class="z-tray" id="z-tray" role="group" aria-label="Azulejos" style="margin-top:8px"></div>
+    <div class="z-row" style="justify-content:center"><button class="z-chip" type="button" id="z-pow"></button><button class="z-chip" type="button" id="z-hint"></button><button class="z-chip" type="button" id="z-undo">Deshacer</button><button class="z-chip" type="button" id="z-again">Reiniciar</button></div>
+  </section>
+  <div class="z-over" id="z-over" hidden role="dialog" aria-modal="true" aria-labelledby="z-o-t"><div class="z-panel"><h2 id="z-o-t"></h2><div class="z-stars" id="z-o-s"></div><p id="z-o-p" style="margin:0 auto"></p><ul class="z-goals" id="z-o-g"></ul><div class="z-row" id="z-o-b"></div></div></div>
+</main>
+<script id="rival">// Rivales del juego sobre el motor: 0 aprendiz, 1 oficial, 2 maestro.
+const Rival = (() => {
+  const E = Engine, pick = a => a[Math.floor(Math.random() * a.length)];
+  const allMoves = (g, s) => { const o = []; for (let v = 0; v < g.cells; v++) if (!s[v]) for (let c = 1; c <= g.k; c++) if (E.legal(g, s, v, c)) o.push([v, c]); return o; };
+  const without = (g, s, list, bad) => list.filter(([v, c]) => { s[v] = c; const b = bad(); s[v] = 0; return !b; });
+  function best(g, s, list, sign, noise) {
+    let top = null, bs = -Infinity;
+    for (const [v, c] of list) { s[v] = c; const x = sign * E.evaluate(g, s) + Math.random() * noise; s[v] = 0; if (x > bs) { bs = x; top = [v, c]; } }
+    return top;
+  }
+  const defenses = (g, s) => without(g, s, allMoves(g, s), () => E.deadCells(g, s).length || E.killers(g, s).length);
+  function alice(g, s, lvl, last, first) {
+    const all = allMoves(g, s); if (!all.length) return null;
+    const alive = without(g, s, all, () => E.deadCells(g, s).length), list = alive.length ? alive : all;
+    if (lvl === 0) {
+      if (E.killers(g, s).length && Math.random() < .5) { const d = defenses(g, s); if (d.length) return pick(d); }
+      return pick(list);
+    }
+    if (lvl === 1) {
+      if (E.killers(g, s).length && Math.random() < .92) { const d = defenses(g, s); return pick(d.length ? d : list); }
+      return best(g, s, list, 1, 24);
+    }
+    return E.chooseAlice(g, s, last, { mirrorOk: first === 'B' });
+  }
+  function bob(g, s, lvl) {
+    const all = allMoves(g, s); if (!all.length) return null;
+    const k = E.killers(g, s);
+    if (lvl === 0) { if (k.length && Math.random() < .5) return pick(k).slice(0, 2); return pick(all); }
+    if (lvl === 1) {
+      if (k.length) return pick(k).slice(0, 2);
+      if (Math.random() < .4) { const m = E.bobMate(g, s, 2, { n: 800 }); if (m) return m; }
+      return best(g, s, all, -1, 40);
+    }
+    return E.chooseBob(g, s);
+  }
+  // Alice en los problemas: la defensa que más aguanta.
+  function defend(g, s, depth) {
+    const d = defenses(g, s);
+    for (const [v, c] of d) { s[v] = c; const m = E.bobMate(g, s, depth, { n: 60000 }); s[v] = 0; if (!m) return [v, c]; }
+    if (d.length) return pick(d);
+    const all = allMoves(g, s), ok = without(g, s, all, () => E.deadCells(g, s).length);
+    return pick(ok.length ? ok : all);
+  }
+  return { alice, bob, defend, allMoves };
+})();
+</script>
+<script>
+(() => {
+'use strict';
+const E = Engine, $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
+const el = (t, c, x) => { const e = document.createElement(t); if (c) e.className = c; if (x != null) e.textContent = x; return e; };
+const pick = a => a[Math.floor(Math.random() * a.length)];
+const calm = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const NAMES = ['', 'azul', 'albero', 'verde', 'granate', 'celeste'];
+
+// ---------- azulejos ----------
+const ART = ['',
+  '<rect width="40" height="40" fill="#2346a8"/><path d="M20 4l4.5 11.5L36 20l-11.500 4.500L20 36l-4.500-11.500L4 20l11.500-4.500z" fill="#fbfaf5"/><circle cx="20" cy="20" r="4" fill="#2346a8"/>',
+  '<rect width="40" height="40" fill="#f0b429"/><path d="M20 3L37 20 20 37 3 20z" fill="#fbfaf5"/><path d="M20 11l9 9-9 9-9-9z" fill="#a8580f"/>',
+  '<rect width="40" height="40" fill="#2e8b57"/><g fill="#fbfaf5"><circle cx="20" cy="11" r="7"/><circle cx="20" cy="29" r="7"/><circle cx="11" cy="20" r="7"/><circle cx="29" cy="20" r="7"/></g><circle cx="20" cy="20" r="5" fill="#2e8b57"/>',
+  '<rect width="40" height="40" fill="#8e2f4a"/><path d="M15 3h10v12h12v10H25v12H15V25H3V15h12z" fill="#fbfaf5"/><rect x="17" y="17" width="6" height="6" fill="#8e2f4a"/>',
+  '<rect width="40" height="40" fill="#57b7d6"/><g fill="none" stroke="#14255c" stroke-width="4"><path d="M0 12q10-10 20 0t20 0"/><path d="M0 24q10-10 20 0t20 0"/><path d="M0 36q10-10 20 0t20 0"/></g>'];
+const tile = c => '<svg viewBox="0 0 40 40" aria-hidden="true">' + ART[c] + '</svg>';
+const HEX = ['', '#2346a8', '#f0b429', '#2e8b57', '#8e2f4a', '#57b7d6'];
+const eye = (x, y, r, lx, ly) => `<circle cx="${x}" cy="${y}" r="${r}" fill="#fff"/><circle cx="${x + (lx || 0)}" cy="${y + (ly || 0)}" r="${r * .62}" fill="#14255c"/><circle cx="${x + (lx || 0) + r * .2}" cy="${y + (ly || 0) - r * .25}" r="${r * .22}" fill="#fff"/>`;
+const line = (p, w, c) => `<path d="${p}" fill="none" stroke="${c || '#14255c'}" stroke-width="${w || 3}" stroke-linecap="round" stroke-linejoin="round"/>`;
+// Alice es un azulejo; Bob, una bola de demolición.
+function face(who, mood) {
+  const m = mood || 'ok';
+  let o;
+  if (who === 'A') {
+    o = '<rect width="80" height="80" fill="#f7dc9a"/><rect x="9" y="13" width="62" height="62" rx="11" fill="#14255c" opacity=".22"/><rect x="9" y="9" width="62" height="62" rx="11" fill="#fbfaf5"/><rect x="9" y="9" width="62" height="62" rx="11" fill="none" stroke="#2346a8" stroke-width="6"/>'
+      + [[21, 21], [59, 21], [21, 59], [59, 59]].map(([x, y]) => `<path d="M${x} ${y - 6}l6 6-6 6-6-6z" fill="${y < 40 ? '#f0b429' : '#57b7d6'}"/>`).join('')
+      + '<circle cx="23" cy="47" r="4.500" fill="#f29c8f"/><circle cx="57" cy="47" r="4.500" fill="#f29c8f"/>';
+    if (m === 'win') o += line('M25 39q6-9 12 0', 3.5) + line('M43 39q6-9 12 0', 3.5) + '<path d="M30 46h20q-1 13-10 13t-10-13z" fill="#14255c"/><path d="M34 55q6-5 12 0-2 4-6 4t-6-4z" fill="#f0685c"/>';
+    else if (m === 'bad') o += eye(31, 39, 7, 0, 1) + eye(49, 39, 7, 0, 1) + line('M24 29l9-4M56 29l-9-4', 3) + line('M34 55q6-7 12 0', 3) + '<path d="M64 20q6 9 0 12-6-3 0-12z" fill="#57b7d6"/>';
+    else o += eye(31, 38, 7) + eye(49, 38, 7) + line('M33 51q7 6 14 0', 3);
+  } else {
+    o = '<rect width="80" height="80" fill="#d9899c"/>' + line('M40 -2v16', 6, '#33385c') + '<rect x="32" y="8" width="16" height="10" rx="3" fill="#33385c"/><circle cx="40" cy="48" r="29" fill="#14255c" opacity=".22"/><circle cx="40" cy="45" r="29" fill="#3f4568"/><path d="M19 36a23 23 0 0116-14" fill="none" stroke="#8088b0" stroke-width="5" stroke-linecap="round"/>';
+    if (m === 'win') o += eye(30, 43, 7, 1, 1) + eye(50, 43, 7, -1, 1) + line('M21 32l14 7M59 32l-14 7', 4.5, '#f0b429') + '<path d="M25 54q15 5 30 0-3 14-15 14T25 54z" fill="#fff"/>' + line('M33 56.500l1 9M40 57v10M47 56.500l-1 9', 2, '#3f4568');
+    else if (m === 'bad') o += line('M25 38l9 9M34 38l-9 9M46 38l9 9M55 38l-9 9', 4, '#fff') + line('M30 62q5-6 10 0t10 0', 3.5, '#fff') + line('M52 18l-5 8 7 4-4 7', 3, '#14172e');
+    else o += eye(30, 44, 7, 1) + eye(50, 44, 7, -1) + line('M21 34l14 5M59 34l-14 5', 4.5, '#f0b429') + line('M30 60q12 5 21-4', 3.5, '#fff');
+  }
+  return '<svg viewBox="0 0 80 80" aria-hidden="true">' + o + '</svg>';
+}
+
+// ---------- guardado y sonido ----------
+let save = { stars: {}, best: 0, walls: 0, puz: {}, mute: false };
+try { save = Object.assign(save, JSON.parse(localStorage.getItem('zocalo-v1') || '{}')); } catch (e) {}
+const store = () => { try { localStorage.setItem('zocalo-v1', JSON.stringify(save)); } catch (e) {} };
+let ac = null;
+function tone(f, t = .12, type = 'triangle', vol = .16, when = 0, to) {
+  if (save.mute) return;
+  try {
+    ac = ac || new (window.AudioContext || window.webkitAudioContext)();
+    if (ac.state === 'suspended') ac.resume();
+    const o = ac.createOscillator(), g = ac.createGain(), s = ac.currentTime + when;
+    o.type = type; o.frequency.setValueAtTime(f, s); if (to) o.frequency.exponentialRampToValueAtTime(to, s + t);
+    g.gain.setValueAtTime(vol, s); g.gain.exponentialRampToValueAtTime(.001, s + t);
+    o.connect(g).connect(ac.destination); o.start(s); o.stop(s + t);
+  } catch (e) {}
+}
+const SND = {
+  place: c => tone([0, 330, 392, 440, 523, 587][c], .13), no: () => tone(130, .12, 'square', .07),
+  warn: () => { tone(220, .1, 'sawtooth', .08); tone(220, .1, 'sawtooth', .08, .14); },
+  save: n => [0, 1, 2].forEach(i => tone(523 * (1 + i * .25) * (1 + Math.min(n, 6) * .06), .12, 'triangle', .14, i * .07)),
+  crack: () => { tone(180, .5, 'sawtooth', .2, 0, 40); tone(90, .6, 'square', .12, .05, 30); },
+  win: () => [523, 659, 784, 1047].forEach((f, i) => tone(f, .22, 'triangle', .16, i * .11)), scrape: () => tone(900, .18, 'sawtooth', .06, 0, 300)
+};
+
+// ---------- rivales en un worker ----------
+let worker = null, req = 0; const waiting = {};
+const think = m => {
+  const g = E.board(m.n, m.k), s = Uint8Array.from(m.s);
+  return m.op === 'defend' ? Rival.defend(g, s, m.depth) : m.op === 'A' ? Rival.alice(g, s, m.lvl, m.last, m.first) : Rival.bob(g, s, m.lvl);
+};
+try {
+  worker = new Worker(URL.createObjectURL(new Blob([$('#engine').textContent + $('#rival').textContent + ';const think=' + think.toString().replace(/\bE\./g, 'Engine.') + ';onmessage=e=>postMessage({id:e.data.id,out:think(e.data)});'], { type: 'text/javascript' })));
+  worker.onmessage = e => { const f = waiting[e.data.id]; delete waiting[e.data.id]; if (f) f(e.data.out); };
+  worker.onerror = () => { worker = null; };
+} catch (e) { worker = null; }
+function ask(m) { return new Promise(r => { if (worker) { m.id = ++req; waiting[m.id] = r; worker.postMessage(m); } else setTimeout(() => r(think(m)), 20); }); }
+
+// ---------- contenido ----------
+const LEVELS = [
+  { t: 'Primera pared', role: 'A', n: 4, k: 5, ai: 0, d: 'Cinco azulejos: aprende sin miedo.' },
+  { t: 'Martillazo', role: 'B', n: 4, k: 3, ai: 0, par: 3, d: 'Tres azulejos. Agrieta la pared.' },
+  { t: 'El patio', role: 'A', n: 5, k: 4, ai: 0, d: 'Cuatro azulejos y un Bob despistado.' },
+  { t: 'Amenaza y remate', role: 'B', n: 7, k: 4, ai: 0, par: 10, d: 'Cuatro azulejos: ahora hay que rodear bien.' },
+  { t: 'Contrarreloj', role: 'A', n: 6, k: 4, ai: 1, clock: 15, d: '15 segundos por azulejo.' },
+  { t: 'Doble turno', role: 'B', n: 8, k: 4, ai: 1, pow: 1, par: 10, d: 'Alice ya responde. Guarda el Doble para el remate.' },
+  { t: 'El espejo', role: 'A', n: 7, k: 4, ai: 2, first: 'B', d: 'Empieza Bob. ¿Y si copias dos filas más allá?' },
+  { t: 'Sin espacio', role: 'B', n: 5, k: 4, ai: 0, par: 8, d: 'Pared corta y ninguna herramienta.' },
+  { t: 'Espátula en mano', role: 'A', n: 4, k: 3, ai: 0, pow: 3, d: 'Con tres azulejos se agrieta todo. Rescátalo.' },
+  { t: 'Contra el teorema', role: 'B', n: 7, k: 4, ai: 2, pow: 1, par: 10, d: 'Alice maestra. Solo el Doble te da opciones.' },
+  { t: 'El zócalo largo', role: 'A', n: 9, k: 4, ai: 2, clock: 12, pow: 1, d: 'Nueve columnas, Bob maestro y 12 segundos.' },
+  { t: 'La última pared', role: 'A', n: 4, k: 3, ai: 1, pow: 3, d: 'Tres azulejos, tres espátulas y un Bob que no perdona.' }
+];
+const PUZ = [{"n":4,"k":3,"d":2,"s":"2000001020201000","win":2},{"n":5,"k":3,"d":2,"s":"30203001000031020000","win":2},{"n":6,"k":3,"d":2,"s":"210000000013203001100300","win":2},{"n":5,"k":4,"d":2,"s":"14030010000001001200","win":1},{"n":6,"k":4,"d":2,"s":"001010010020100100012003","win":2},{"n":6,"k":4,"d":3,"s":"002301200102010000040002","win":2},{"n":7,"k":4,"d":3,"s":"0103020000000000024100400000","win":1}];
+const SAY = {
+  A: { idle: ['«Aquí va bien este.»', '«Pared recta, mente clara.»', '«Uno más.»'], threat: ['«¡Eso no me gusta!»'], win: ['«¡Terminada!»'], lose: ['«¡Mi pared!»'] },
+  B: { idle: ['«A ver cómo sales de esta.»', '«Yo solo paso por aquí.»', '«Qué pena de pared.»'], threat: ['«¿Oyes ese crujido?»', '«Ahí, ahí…»'], win: ['«¡Crac!»'], lose: ['«Bah. Quedó bonita.»'] }
+};
+
+// ---------- partida ----------
+let P = null, tick = 0, coach = 0;
+const other = w => w === 'A' ? 'B' : 'A';
+const isHuman = w => P.role === '2' || P.role === w;
+const avail = v => { const m = E.seen(P.g, P.s, v), o = []; for (let c = 1; c <= P.g.k; c++) if (!(m & (1 << (c - 1)))) o.push(c); return o; };
+const victims = () => new Set(E.killers(P.g, P.s).map(x => x[2]));
+function start(o) {
+  clearInterval(tick);
+  const g = E.board(o.n, o.k);
+  P = { o, g, s: o.s ? Uint8Array.from(o.s, Number) : new Uint8Array(g.cells), role: o.role, turn: o.first || 'A', sel: -1, pow: o.pow || 0, hints: 3, armed: false, scrape: false, rescue: false,
+    score: o.score || 0, combo: 0, moves: 0, helped: false, over: false, busy: false, epoch: (P ? P.epoch : 0) + 1, hist: [], last: -1, mood: { A: 'ok', B: 'ok' }, hint: null, t0: Date.now(), focus: 0 };
+  coach = o.id === 0 && !save.stars[0] ? 1 : 0;
+  show('play'); $('#z-over').hidden = true;
+  $('#z-title').textContent = o.t;
+  say(coach ? 'Toca un hueco de la pared.' : o.mode === 'puz' ? `Agrieta la pared en ${o.d} jugadas.` : P.role === '2' ? 'Empieza Alice.' : isHuman(P.turn) ? (P.role === 'A' ? 'Eres Alice. Completa la pared.' : 'Eres Bob. Agrieta la pared.') : (P.role === 'A' ? 'Eres Alice. Empieza Bob.' : 'Eres Bob. Empieza Alice.'));
+  draw(); next();
+}
+function say(t) { $('#z-say').textContent = t; }
+function fit() {
+  if (!P || $('[data-s=play]').hidden) return;
+  const w = $('#z').clientWidth - 32 - 12 - 3 * (P.g.n - 1);
+  $('#z-wall').style.setProperty('--cs', Math.max(30, Math.min(84, Math.floor(w / P.g.n))) + 'px');
+  $('#z-wall').style.gridTemplateColumns = `repeat(${P.g.n}, var(--cs))`;
+}
+function cellHTML(v, showDots) {
+  if (P.s[v]) return tile(P.s[v]);
+  if (!showDots) return '';
+  return '<span class="dots">' + avail(v).map(c => `<i style="background:${HEX[c]}"></i>`).join('') + '</span>';
+}
+function draw() {
+  fit();
+  const W = $('#z-wall'), n = P.g.n, vic = P.over ? new Set() : victims(), dead = new Set(E.deadCells(P.g, P.s));
+  if (W.children.length !== P.g.cells || W.dataset.n !== String(n)) {
+    W.dataset.n = n; W.innerHTML = '';
+    for (let r = 3; r >= 0; r--) for (let c = 0; c < n; c++) { const b = el('button', 'z-cell'); b.type = 'button'; b.dataset.v = r * n + c; W.appendChild(b); }
+  }
+  for (const b of W.children) {
+    const v = +b.dataset.v, e = !P.s[v];
+    b.className = 'z-cell' + (v === P.last ? ' last' : '') + (v === P.pop ? ' pop' : '') + (vic.has(v) ? ' warn' : '') + (dead.has(v) ? ' dead' : '') + (P.hint && P.hint[0] === v ? ' hint' : '') + (v === P.sel ? ' sel' : '') + (scrapable(v) ? ' scr' : '');
+    b.innerHTML = cellHTML(v, true);
+    b.setAttribute('aria-label', `Fila ${Math.floor(v / n) + 1}, columna ${v % n + 1}: ` + (e ? (dead.has(v) ? 'agrietado' : 'hueco' + (vic.has(v) ? ' en peligro' : '')) : NAMES[P.s[v]]));
+  }
+  P.pop = -1;
+  const T = $('#z-tray'), ok = P.sel >= 0 && !P.s[P.sel] ? avail(P.sel) : null;
+  T.innerHTML = '';
+  for (let c = 1; c <= P.g.k; c++) {
+    const b = el('button', 'z-t'); b.type = 'button'; b.innerHTML = tile(c);
+    b.disabled = !ok || !ok.includes(c) || !myTurn(); b.setAttribute('aria-label', 'Colocar ' + NAMES[c]);
+    b.addEventListener('click', () => human(P.sel, c)); T.appendChild(b);
+  }
+  for (const w of ['A', 'B']) {
+    const box = $(w === 'A' ? '#z-wa' : '#z-wb'); box.className = 'z-who' + (w === 'B' ? ' r' : '') + (P.turn === w && !P.over ? ' turn' : '');
+    box.innerHTML = face(w, P.mood[w]); const d = el('div', null, w === 'A' ? 'Alice' : 'Bob');
+    d.appendChild(el('small', null, P.role === '2' ? (P.turn === w ? 'te toca' : '') : P.role === w ? 'tú' : ['aprendiz', 'oficial', 'maestro'][P.o.ai] || 'rival')); box.appendChild(d);
+  }
+  const solo = P.role !== '2';
+  $('#z-score').textContent = P.o.mode === 'puz' ? `${Math.max(0, P.o.d - P.moves)}` : solo ? P.score : '·';
+  $('#z-pow').hidden = !P.pow && !P.armed && !P.scrape; $('#z-pow').textContent = (P.role === 'A' ? 'Espátula' : 'Doble') + ' ×' + P.pow; $('#z-pow').className = 'z-chip' + (P.armed || P.scrape ? ' on' : '');
+  $('#z-pow').disabled = !myTurn() || P.rescue;
+  $('#z-hint').hidden = P.o.mode !== 'camp'; $('#z-hint').textContent = 'Pista ×' + P.hints; $('#z-hint').disabled = !myTurn() || !P.hints || P.rescue;
+  $('#z-undo').hidden = P.o.mode === 'endless' || P.o.mode === 'puz'; $('#z-undo').disabled = !P.hist.length || P.busy || P.over || (P.role !== '2' && !P.hist.some(h => h.w === P.role));
+  $('#z-again').hidden = P.o.mode === 'endless';
+}
+const myTurn = () => !P.over && !P.busy && (P.rescue || isHuman(P.turn));
+function scrapable(v) {
+  if (!P.s[v]) return false;
+  if (P.rescue) return E.deadCells(P.g, P.s).some(d => P.g.nb[d].includes(v));
+  return P.scrape;
+}
+function tapCell(v) {
+  if (!myTurn()) return;
+  P.focus = v;
+  if (P.rescue || P.scrape) { if (scrapable(v)) scrape(v); else SND.no(); return; }
+  if (P.s[v]) { P.sel = -1; draw(); return; }
+  P.sel = P.sel === v ? -1 : v; P.hint = null;
+  if (coach === 1 && P.sel >= 0) { coach = 2; say('Ahora elige un azulejo. Los apagados no caben: hay uno igual al lado.'); }
+  draw();
+}
+function human(v, c) {
+  if (!myTurn() || P.rescue || P.scrape || v < 0) return;
+  if (!E.legal(P.g, P.s, v, c)) { SND.no(); return; }
+  if (coach === 2) { coach = 3; setTimeout(() => { if (coach === 3 && !P.over) say('Los puntos son los azulejos que aún caben. Que ningún hueco se quede sin puntos.'); }, 900); }
+  play(v, c);
+}
+function play(v, c) {
+  const w = P.turn, mine = P.role !== '2' && P.role === w, before = victims();
+  clearInterval(tick);
+  P.hist.push({ s: P.s.slice(), w, pow: P.pow, score: P.score, combo: P.combo, moves: P.moves, last: P.last });
+  P.s[v] = c; P.last = v; P.pop = v; P.sel = -1; P.hint = null; P.mood = { A: 'ok', B: 'ok' };
+  SND.place(c); if (mine) { P.moves++; P.score += 10; }
+  bits(v, c);
+  const dead = E.deadCells(P.g, P.s);
+  if (dead.length) return crack(w);
+  if (!E.freeCount(P.s)) return finish('A');
+  const after = victims(), fresh = [...after].filter(x => !before.has(x)).length;
+  if (w === 'A') {
+    if (before.size && !after.size) {
+      if (mine) { P.combo++; const pts = 40 * P.combo; P.score += pts; pop(P.combo > 1 ? `¡Salvada ×${P.combo}! +${pts}` : `¡Salvada! +${pts}`); }
+      P.mood = { A: 'win', B: 'bad' }; SND.save(P.combo); say(mine ? 'La has salvado por los pelos.' : '«¡De eso nada!»');
+    } else if (after.size && mine) say('Cuidado: queda un hueco en peligro.');
+  } else if (fresh) {
+    if (mine) { const pts = fresh > 1 ? 120 : 40; P.score += pts; pop(fresh > 1 ? `¡Doble amenaza! +${pts}` : `¡Amenaza! +${pts}`); } else pop('¡Peligro!', true);
+    P.mood = { A: 'bad', B: 'win' }; SND.warn(); say(mine ? 'Ese hueco está a una jugada de agrietarse.' : pick(SAY.B.threat));
+  }
+  if (w === 'B' && P.armed) { P.armed = false; say('Doble: coloca otro azulejo.'); return draw(), next(true); }
+  P.turn = other(w);
+  draw(); next();
+}
+function next(same) {
+  if (P.over) return;
+  if (isHuman(P.turn)) {
+    if (P.o.mode === 'puz' && P.moves >= P.o.d) return fail();
+    if (P.o.clock) startClock();
+    return draw();
+  }
+  P.busy = true; draw();
+  const ep = P.epoch, w = P.turn, t0 = Date.now();
+  if (!victims().size && Math.random() < .3 && coach === 0 && P.hist.length) say(pick(SAY[w].idle));
+  const m = P.o.mode === 'puz' ? { op: 'defend', depth: Math.max(1, P.o.d - P.moves) } : { op: w, lvl: P.o.ai, last: P.last >= 0 ? [P.last, P.s[P.last]] : null, first: P.o.first || 'A' };
+  ask(Object.assign(m, { n: P.g.n, k: P.g.k, s: [...P.s] })).then(mv => setTimeout(() => {
+    if (ep !== P.epoch || P.over) return;
+    P.busy = false;
+    if (mv && E.legal(P.g, P.s, mv[0], mv[1])) play(mv[0], mv[1]);
+    else { const all = Rival.allMoves(P.g, P.s); if (all.length) play(...pick(all)); }
+  }, Math.max(0, 620 - (Date.now() - t0))));
+}
+function startClock() {
+  clearInterval(tick);
+  const c = $('#z-clock'), end = Date.now() + P.o.clock * 1000, ep = P.epoch;
+  c.hidden = false;
+  const step = () => {
+    if (ep !== P.epoch || P.over) return clearInterval(tick);
+    const left = Math.max(0, end - Date.now());
+    c.firstElementChild.style.width = left / (P.o.clock * 10) + '%'; c.classList.toggle('low', left < 4000);
+    if (!left) {
+      clearInterval(tick);
+      if (P.rescue) return lose();
+      P.scrape = false;
+      const all = Rival.allMoves(P.g, P.s); pop('¡Tiempo!', true); say('Se acabó el tiempo: azulejo al azar.');
+      if (all.length) play(...pick(all));
+    }
+  };
+  step(); tick = setInterval(step, 100);
+}
+function crack(w) {
+  SND.crack(); P.mood = { A: 'bad', B: 'win' };
+  const box = $('#z-box'); box.classList.remove('shake'); void box.offsetWidth; box.classList.add('shake');
+  if (P.role === 'A' && P.pow > 0) {
+    P.rescue = true; P.combo = 0; P.turn = 'A'; pop('¡Crac!', true);
+    say('La pared se agrieta. Quita con la espátula un azulejo junto al hueco roto.');
+    draw(); if (P.o.clock) startClock(); return;
+  }
+  draw(); pop('¡Crac!', true);
+  finish('B');
+}
+function scrape(v) {
+  const was = P.rescue;
+  P.hist.push({ s: P.s.slice(), w: 'A', pow: P.pow, score: P.score, combo: P.combo, moves: P.moves, last: P.last });
+  P.s[v] = 0; P.pow--; P.scrape = false; P.last = -1; SND.scrape();
+  if (E.deadCells(P.g, P.s).length) { if (P.pow > 0) { P.rescue = true; say('Sigue agrietada: quita otro azulejo.'); return draw(); } return lose(); }
+  P.rescue = false; P.mood = { A: 'ok', B: 'bad' };
+  if (was) { pop('¡Rescatada!'); SND.save(2); }
+  say('Sigue siendo tu turno.'); draw(); if (P.o.clock) startClock();
+}
+const lose = () => { P.rescue = false; finish('B'); };
+function finish(winner) {
+  clearInterval(tick); P.over = true; P.busy = false; P.rescue = false; P.scrape = false; P.sel = -1;
+  P.mood = winner === 'A' ? { A: 'win', B: 'bad' } : { A: 'bad', B: 'win' };
+  draw(); say(pick(SAY[winner].win));
+  const ep = P.epoch, won = P.role === '2' || P.role === winner;
+  if (winner === 'A') { SND.win(); party(); } else if (won) setTimeout(SND.win, 400);
+  setTimeout(() => { if (ep === P.epoch) result(winner, won); }, winner === 'A' ? 1100 : 1300);
+}
+function fail() { P.over = true; clearInterval(tick); draw(); result('A', false); }
+
+// ---------- efectos ----------
+function pop(t, bad) { const e = el('div', 'z-pop' + (bad ? ' bad' : ''), t); $('#z-box').appendChild(e); setTimeout(() => e.remove(), 1250); }
+function bits(v, c) {
+  if (calm) return;
+  const b = $(`#z-wall [data-v="${v}"]`); if (!b) return;
+  for (let i = 0; i < 8; i++) {
+    const p = el('i', 'z-bit'); p.style.background = HEX[c];
+    p.style.left = 6 + b.offsetLeft + b.offsetWidth / 2 + 'px'; p.style.top = 6 + b.offsetTop + b.offsetHeight / 2 + 'px';
+    $('#z-box').appendChild(p); const a = Math.random() * 6.28, d = 26 + Math.random() * 34;
+    p.animate([{ transform: 'none', opacity: 1 }, { transform: `translate(${Math.cos(a) * d}px,${Math.sin(a) * d + 18}px) rotate(200deg) scale(.3)`, opacity: 0 }], { duration: 480, easing: 'ease-out' }).onfinish = () => p.remove();
+  }
+}
+function party() {
+  if (calm) return;
+  $$('#z-wall .z-cell').forEach(b => { const v = +b.dataset.v; b.animate([{ transform: 'none' }, { transform: 'translateY(-10px) rotate(4deg)' }, { transform: 'none' }], { duration: 380, delay: (v % P.g.n) * 55 }); });
+}
+
+// ---------- resultado ----------
+function result(winner, won) {
+  const o = P.o, goals = []; let stars = 0, buttons = [];
+  const O = (t, p) => { $('#z-o-t').textContent = t; $('#z-o-p').textContent = p; };
+  if (o.mode === 'camp') {
+    if (won) {
+      const par = P.role === 'B' ? P.moves <= o.par : P.combo >= 0 && (Date.now() - P.t0) / 1000 <= o.n * 2 * 9;
+      goals.push([true, P.role === 'A' ? 'Pared completa' : 'Pared agrietada'], [!P.helped, 'Sin pistas ni deshacer'], [par, P.role === 'B' ? `En ${o.par} azulejos o menos (${P.moves})` : `En ${o.n * 18} segundos o menos`]);
+      stars = goals.filter(g => g[0]).length;
+      if (stars > (save.stars[o.id] || 0)) { save.stars[o.id] = stars; store(); }
+    }
+    O(won ? (P.role === 'A' ? '¡Pared terminada!' : '¡Pared agrietada!') : (P.role === 'A' ? 'Se ha agrietado' : 'Alice la ha terminado'), won ? `${P.score} puntos` : P.role === 'A' ? 'Responde siempre a los huecos rojos. Dos peligros a la vez no se pueden parar.' : 'Busca una jugada que amenace dos huecos a la vez.');
+    if (won && o.id + 1 < LEVELS.length) buttons.push(['Siguiente nivel', () => startLevel(o.id + 1)]);
+    buttons.push([won ? 'Repetir' : 'Otra vez', () => startLevel(o.id)], ['Niveles', () => go('map')]);
+  } else if (o.mode === 'endless') {
+    if (won) { const w = o.wall + 1; O(`Pared ${w} lista`, `${P.score} puntos. La siguiente es más difícil.`); buttons.push(['Siguiente pared', () => startWall(w, P.score, Math.min(3, P.pow + (w % 2 === 0 ? 1 : 0)))]); }
+    else {
+      const rec = P.score > save.best; save.best = Math.max(save.best, P.score); save.walls = Math.max(save.walls, o.wall); store();
+      O(rec ? '¡Récord!' : 'Fin de la obra', `${P.score} puntos y ${o.wall} ${o.wall === 1 ? 'pared' : 'paredes'}. Tu mejor marca: ${save.best}.`);
+      buttons.push(['Otra vez', () => startWall(0, 0, 2)], ['Copiar marca', b => copy(`Zócalo: ${P.score} puntos y ${o.wall} paredes en la Obra sin fin. ¿Me superas?`, b)], ['Inicio', () => go('home')]);
+    }
+  } else if (o.mode === 'puz') {
+    if (won) { save.puz[o.id] = 1; store(); }
+    O(won ? '¡Golpe maestro!' : 'La pared aguanta', won ? 'Cada amenaza obligó a Alice a responder.' : `Había solución en ${o.d} jugadas. Empieza por una amenaza.`);
+    if (won && o.id + 1 < PUZ.length) buttons.push(['Siguiente', () => startPuz(o.id + 1)]);
+    buttons.push([won ? 'Repetir' : 'Otra vez', () => startPuz(o.id)], ['Problemas', () => go('puz')]);
+  } else {
+    O(winner === 'A' ? 'Gana Alice' : 'Gana Bob', winner === 'A' ? 'La pared está completa.' : 'La pared se ha agrietado.');
+    buttons.push(['Revancha', () => start(o)], ['Cambiar', () => go('duel')]);
+  }
+  const S = $('#z-o-s'); S.hidden = o.mode !== 'camp' || !won; S.innerHTML = ''; S.setAttribute('aria-label', stars + ' de 3 estrellas');
+  for (let i = 0; i < 3; i++) { const b = el(i < stars ? 'b' : 'span', null, '★'); b.style.animationDelay = i * .18 + 's'; S.appendChild(b); }
+  const G = $('#z-o-g'); G.innerHTML = ''; G.hidden = !goals.length;
+  goals.forEach(([ok, t]) => G.appendChild(el('li', ok ? 'y' : 'n', (ok ? '★ ' : '☆ ') + t)));
+  const B = $('#z-o-b'); B.innerHTML = '';
+  buttons.forEach(([t, f], i) => { const b = el('button', 'z-btn' + (i ? ' alt' : ''), t); b.type = 'button'; b.addEventListener('click', () => f(b)); B.appendChild(b); });
+  $('#z-over').hidden = false; B.firstElementChild.focus({ preventScroll: true });
+}
+function copy(t, b) {
+  const done = () => { b.textContent = 'Copiada'; }, no = () => { $('#z-o-p').textContent = t; b.textContent = 'Selecciónala arriba'; };
+  try { navigator.clipboard.writeText(t).then(done, no); } catch (e) { no(); }
+}
+
+// ---------- modos ----------
+const startLevel = i => start(Object.assign({ mode: 'camp', id: i }, LEVELS[i]));
+const startWall = (w, score, pow) => start({ mode: 'endless', wall: w, score, pow, t: `Pared ${w + 1}`, role: 'A', n: Math.min(4 + w, 9), k: 4, ai: w < 2 ? 0 : w < 4 ? 1 : 2, clock: Math.max(5, 16 - w) });
+const startPuz = i => start(Object.assign({ mode: 'puz', id: i, t: `Golpe ${i + 1}`, role: 'B', first: 'B', ai: 2 }, PUZ[i]));
+const duel = { k: 4, n: 6 };
+function chips(host, list, key) {
+  host.innerHTML = '';
+  list.forEach(x => { const b = el('button', 'z-chip' + (duel[key] === x ? ' on' : ''), x); b.type = 'button'; b.setAttribute('aria-pressed', duel[key] === x); b.addEventListener('click', () => { duel[key] = x; go('duel'); }); host.appendChild(b); });
+}
+function starText(n) { return '★'.repeat(n) + '☆'.repeat(3 - n); }
+function go(s) {
+  clearInterval(tick); if (P) { P.epoch++; P.over = true; } $('#z-over').hidden = true; $('#z-clock').hidden = true;
+  if (s === 'endless') return startWall(0, 0, 2);
+  const total = Object.values(save.stars).reduce((a, b) => a + b, 0), nextLv = LEVELS.findIndex((_, i) => !save.stars[i]);
+  if (s === 'home') {
+    $('#z-c-sub').textContent = `${total} de ${LEVELS.length * 3} estrellas`; $('#z-e-sub').textContent = save.best ? `Récord: ${save.best} puntos` : 'Paredes cada vez más largas';
+    $('#z-p-sub').textContent = `${Object.keys(save.puz).length} de ${PUZ.length} resueltos`;
+    $('#z-play').textContent = nextLv < 0 ? 'Jugar: Obra sin fin' : total ? `Seguir: nivel ${nextLv + 1}` : 'Jugar';
+    $('#z-play').onclick = () => nextLv < 0 ? go('endless') : startLevel(nextLv);
+  }
+  if (s === 'map') {
+    $('#z-map-sub').textContent = `${total} de ${LEVELS.length * 3} estrellas. En azul juegas con Alice; en granate, con Bob.`;
+    const H = $('#z-levels'); H.innerHTML = '';
+    LEVELS.forEach((l, i) => {
+      const open = i === 0 || save.stars[i - 1] || save.stars[i], b = el('button', 'z-lv' + (l.role === 'B' ? ' bob' : '')); b.type = 'button'; b.disabled = !open;
+      b.appendChild(el('em', null, i + 1)); const t = el('strong', null, l.t); t.appendChild(el('i', null, open ? starText(save.stars[i] || 0) : 'cerrado')); b.append(t, el('span', null, l.d));
+      b.addEventListener('click', () => startLevel(i)); H.appendChild(b);
+    });
+  }
+  if (s === 'puz') {
+    const H = $('#z-puzzles'); H.innerHTML = '';
+    PUZ.forEach((p, i) => { const b = el('button', 'z-lv bob'); b.type = 'button'; b.appendChild(el('em', null, i + 1)); const t = el('strong', null, `Agrieta en ${p.d}`); t.appendChild(el('i', null, save.puz[i] ? 'resuelto' : '')); b.append(t, el('span', null, `${p.k} azulejos, ${p.n} columnas`)); b.addEventListener('click', () => startPuz(i)); H.appendChild(b); });
+  }
+  if (s === 'duel') {
+    chips($('#z-d-k'), [3, 4, 5], 'k'); chips($('#z-d-n'), [4, 5, 6, 7, 8, 9], 'n');
+    $('#z-d-note').textContent = duel.k === 3 ? 'Con 3 azulejos manda Bob.' : duel.k === 4 ? 'Con 4 azulejos, una Alice perfecta nunca pierde.' : 'Con 5 azulejos Alice no puede perder: cada hueco tiene como mucho 4 vecinos.';
+  }
+  show(s);
+}
+function show(s) { $$('#z .z-screen').forEach(x => { x.hidden = x.dataset.s !== s; }); window.scrollTo(0, 0); demoOn(s === 'home'); }
+
+// ---------- pared de la portada ----------
+let demo = null;
+function demoOn(on) {
+  clearInterval(demo); if (!on) return;
+  const host = $('#z-demo'), n = 8, g = E.board(n, 4), s = new Uint8Array(g.cells);
+  const step = () => { const free = Rival.allMoves(g, s).filter(([v, c]) => { s[v] = c; const d = E.deadCells(g, s).length; s[v] = 0; return !d; }); if (!free.length) { s.fill(0); return; } const [v, c] = pick(free); s[v] = c; };
+  for (let i = 0; i < 18; i++) step();
+  const paint = () => {
+    host.style.setProperty('--cs', Math.min(62, Math.floor(($('#z').clientWidth - 32 - 12 - 21) / n)) + 'px'); host.style.gridTemplateColumns = `repeat(${n}, var(--cs))`;
+    host.innerHTML = ''; for (let r = 3; r >= 0; r--) for (let c = 0; c < n; c++) { const d = el('div', 'z-cell'); if (s[r * n + c]) d.innerHTML = tile(s[r * n + c]); host.appendChild(d); }
+  };
+  paint(); if (!calm) demo = setInterval(() => { step(); paint(); }, 900);
+}
+
+// ---------- controles ----------
+$('#z-wall').addEventListener('click', e => { const b = e.target.closest('.z-cell'); if (b) tapCell(+b.dataset.v); });
+$$('#z [data-go]').forEach(b => b.addEventListener('click', () => go(b.dataset.go)));
+$('#z-exit').addEventListener('click', () => go(P.o.mode === 'camp' ? 'map' : P.o.mode === 'puz' ? 'puz' : P.o.mode === 'duel' ? 'duel' : 'home'));
+$('#z-again').addEventListener('click', () => start(P.o));
+$('#z-d-go').addEventListener('click', () => start({ mode: 'duel', t: 'Duelo', role: '2', n: duel.n, k: duel.k, ai: 0 }));
+$('#z-pow').addEventListener('click', () => {
+  if (!myTurn()) return;
+  if (P.role === 'A') { P.scrape = !P.scrape; P.sel = -1; say(P.scrape ? 'Toca el azulejo que quieres quitar.' : 'Espátula guardada.'); }
+  else if (P.armed) { P.armed = false; P.pow++; say('Doble guardado.'); }
+  else { P.armed = true; P.pow--; say('Doble listo: colocarás dos azulejos seguidos.'); }
+  draw();
+});
+$('#z-hint').addEventListener('click', () => {
+  if (!myTurn() || !P.hints) return;
+  const ep = P.epoch, h = P.hist.length; P.hints--; P.helped = true; say('Pensando…'); draw();
+  ask({ op: P.turn, lvl: 2, n: P.g.n, k: P.g.k, s: [...P.s], last: P.last >= 0 ? [P.last, P.s[P.last]] : null, first: P.o.first || 'A' }).then(m => {
+    if (ep !== P.epoch || h !== P.hist.length || P.over || !m) return;
+    P.hint = m; P.sel = m[0]; say(`Prueba el ${NAMES[m[1]]} en el hueco marcado.`); draw();
+  });
+});
+$('#z-undo').addEventListener('click', () => {
+  if (P.busy || P.over || !P.hist.length) return;
+  let h; do { h = P.hist.pop(); } while (P.hist.length && P.role !== '2' && h.w !== P.role);
+  P.s = h.s; P.turn = h.w; P.score = h.score; P.combo = h.combo; P.moves = h.moves; P.last = h.last; P.pow = h.pow; P.rescue = false; P.scrape = false; P.armed = false; P.sel = -1; P.hint = null; P.helped = true; P.mood = { A: 'ok', B: 'ok' };
+  say('Jugada deshecha.'); draw(); next();
+});
+const muteUI = () => $$('.z-mutebtn').forEach(b => { b.textContent = 'Sonido: ' + (save.mute ? 'no' : 'sí'); });
+$$('.z-mutebtn').forEach(b => b.addEventListener('click', () => { save.mute = !save.mute; store(); muteUI(); if (!save.mute) SND.place(3); }));
+document.addEventListener('keydown', e => {
+  if ($('#z').hidden || $('[data-s=play]').hidden || !P || P.over || e.ctrlKey || e.metaKey || e.altKey) return;
+  const d = { ArrowUp: P.g.n, ArrowDown: -P.g.n, ArrowLeft: -1, ArrowRight: 1 }[e.key];
+  if (d) { const v = (P.sel >= 0 ? P.sel : P.focus) + d; if (v < 0 || v >= P.g.cells || (Math.abs(d) === 1 && Math.floor(v / P.g.n) !== Math.floor((v - d) / P.g.n))) return; e.preventDefault(); P.focus = v; P.sel = v; const b = $(`#z-wall [data-v="${v}"]`); if (b) b.focus(); draw(); }
+  else if (/^[1-5]$/.test(e.key) && +e.key <= P.g.k && P.sel >= 0) human(P.sel, +e.key);
+});
+addEventListener('resize', () => { fit(); if (!$('[data-s=home]').hidden && !$('#z').hidden) demoOn(true); });
+const CLASS = ['juego', 'cota', 'espejo', 'laboratorio', 'configuraciones'];
+function mode() {
+  const cls = CLASS.includes(location.hash.slice(1));
+  $('#z').hidden = cls; $('#clase').hidden = !cls; document.body.classList.toggle('z-on', !cls);
+  if (cls) { clearInterval(demo); clearInterval(tick); if (P) { P.epoch++; P.over = true; } } else go('home');
+}
+addEventListener('hashchange', mode);
+$('#z-cast').innerHTML = face('A', 'ok') + face('B', 'win');
+muteUI(); mode();
+window.Zocalo = { get P() { return P; }, play: (v, c) => human(v, c), tap: tapCell, go, startLevel, startPuz, startWall, LEVELS, PUZ, draw };
+})();
+</script>
+</body></html>
